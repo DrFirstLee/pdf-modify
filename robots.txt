@@ -1,5 +1,5 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://pdf-modify.netlify.app/sitemap.xml
-Host: https://pdf-modify.netlify.app
+Sitemap: https://pdf-modify.naranja.my/sitemap.xml
+Host: https://pdf-modify.naranja.my

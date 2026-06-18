@@ -1,0 +1,9 @@
+{
+  "servers": {
+    "pdf-modify-mcp": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@drfirst/pdf-modify-mcp"]
+    }
+  }
+}

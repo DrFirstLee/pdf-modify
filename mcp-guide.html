@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PDF Modify MCP Guide - JSON-RPC, npm, npx, and Local PDF Tools</title>
+  <meta name="description" content="Learn how PDF Modify MCP works with JSON-RPC, npm, npx, MCP clients, and local PDF automation tools such as merge, split, reorder, crop, DOCX/PPTX conversion, and PDF export.">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#f7f4ea">
+  <link rel="canonical" href="https://pdf-modify.naranja.my/mcp-guide.html">
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f7f4ea;
+      --surface: #ffffff;
+      --ink: #182230;
+      --muted: #667085;
+      --line: #d8d3c7;
+      --accent: #e8503a;
+      --accent-strong: #bf2f22;
+      --teal: #0f766e;
+      --blue: #2563eb;
+      --code: #101828;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      background: var(--paper);
+      color: var(--ink);
+    }
+
+    a { color: inherit; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px clamp(16px, 4vw, 40px);
+      border-bottom: 1px solid rgba(24, 34, 48, 0.12);
+      background: rgba(247, 244, 234, 0.94);
+      backdrop-filter: blur(14px);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 900;
+      text-decoration: none;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 7px;
+      background: var(--accent);
+      color: white;
+      font-size: 0.8rem;
+      letter-spacing: 0;
+    }
+
+    .nav {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .nav a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 40px;
+      padding: 0 14px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--surface);
+      color: var(--ink);
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    main {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+      padding: 34px clamp(16px, 4vw, 36px) 64px;
+    }
+
+    .hero {
+      display: grid;
+      gap: 18px;
+      padding: clamp(18px, 4vw, 38px) 0 28px;
+    }
+
+    .eyebrow {
+      margin: 0;
+      color: var(--accent-strong);
+      font-size: 0.78rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1 {
+      max-width: 860px;
+      margin-bottom: 4px;
+      font-size: clamp(2.2rem, 6vw, 4.6rem);
+      line-height: 1.02;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      max-width: 860px;
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: clamp(1rem, 1.7vw, 1.18rem);
+      line-height: 1.7;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .summary-card, .section, .flow, .tool-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      box-shadow: 0 1px 0 rgba(24, 34, 48, 0.03);
+    }
+
+    .summary-card {
+      padding: 16px;
+      min-height: 120px;
+      border-left: 4px solid var(--teal);
+    }
+
+    .summary-card strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 1.02rem;
+    }
+
+    .summary-card p, .section p, .tool-card p {
+      margin-bottom: 0;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .section {
+      margin-top: 16px;
+      padding: clamp(18px, 3vw, 26px);
+    }
+
+    .section h2 {
+      margin-bottom: 10px;
+      font-size: clamp(1.35rem, 3vw, 2rem);
+      letter-spacing: 0;
+    }
+
+    .section h3 {
+      margin-bottom: 8px;
+      font-size: 1.04rem;
+    }
+
+    .flow {
+      display: grid;
+      gap: 10px;
+      margin: 16px 0;
+      padding: 16px;
+      background: #fffdf8;
+    }
+
+    .flow-step {
+      display: grid;
+      grid-template-columns: 32px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+    }
+
+    .step-number {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 7px;
+      background: var(--ink);
+      color: #fff;
+      font-weight: 900;
+    }
+
+    .flow-step strong { display: block; margin-bottom: 3px; }
+    .flow-step span { color: var(--muted); line-height: 1.55; }
+
+    pre {
+      overflow: auto;
+      margin: 14px 0 0;
+      padding: 16px;
+      border-radius: 8px;
+      background: var(--code);
+      color: #f8fafc;
+      font-size: 0.92rem;
+      line-height: 1.55;
+    }
+
+    code {
+      font-family: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+    }
+
+    .inline-code {
+      padding: 2px 5px;
+      border-radius: 5px;
+      background: #ede7dc;
+      color: var(--ink);
+      font-family: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+      font-size: 0.92em;
+    }
+
+    .compare {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .tool-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .tool-card { padding: 16px; }
+    .tool-card strong { display: block; margin-bottom: 6px; }
+
+    .note {
+      margin-top: 14px;
+      padding: 14px 16px;
+      border-left: 4px solid var(--blue);
+      border-radius: 7px;
+      background: #eff6ff;
+      color: #1e3a8a;
+      line-height: 1.6;
+    }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      padding: 24px clamp(16px, 4vw, 40px);
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      background: #efeadf;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 820px) {
+      .summary-grid, .compare, .tool-grid { grid-template-columns: 1fr; }
+      .topbar { align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="PDF Modify home">
+      <span class="brand-mark">PDF</span>
+      <span>PDF Modify</span>
+    </a>
+    <nav class="nav" aria-label="Guide navigation">
+      <a href="index.html">웹 도구</a>
+      <a href="privacy.html">개인정보처리방침</a>
+      <a href="https://www.npmjs.com/package/@drfirst/pdf-modify-mcp">npm 패키지</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="pageTitle">
+      <p class="eyebrow">MCP 학습 노트</p>
+      <h1 id="pageTitle">PDF Modify MCP를 이해하기 위한 JSON-RPC, npm, npx, MCP 흐름</h1>
+      <p class="lead">이 문서는 PDF Modify 웹사이트를 만들며 함께 개발한 <span class="inline-code">@drfirst/pdf-modify-mcp</span> 서버를 소개하고, npm과 npx, JSON-RPC, MCP 클라이언트와 로컬 백엔드가 어떻게 연결되는지 설명합니다.</p>
+      <div class="summary-grid" aria-label="Key concepts">
+        <article class="summary-card">
+          <strong>npm</strong>
+          <p>Node.js 생태계의 패키지 저장소이자 설치 도구입니다. Python의 PyPI와 pip를 합친 역할에 가깝습니다.</p>
+        </article>
+        <article class="summary-card">
+          <strong>npx</strong>
+          <p>npm에 올라간 실행 가능한 패키지를 내려받아 바로 실행합니다. 사용자는 저장소를 clone하지 않아도 됩니다.</p>
+        </article>
+        <article class="summary-card">
+          <strong>MCP</strong>
+          <p>LLM이 로컬 도구를 표준 방식으로 발견하고 호출할 수 있게 하는 프로토콜입니다.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>pdf-master-mcp, 또는 PDF Modify MCP란?</h2>
+      <p><span class="inline-code">@drfirst/pdf-modify-mcp</span>는 PDF Modify에서 구현한 PDF 작업 기능을 MCP 도구로 쓸 수 있게 만든 로컬 서버입니다. 웹사이트는 브라우저에서 동작하고, MCP 서버는 사용자의 PC에서 Node.js 프로세스로 동작합니다. 둘 다 파일을 외부 서버로 업로드하지 않는다는 철학을 공유합니다.</p>
+      <div class="tool-grid">
+        <article class="tool-card"><strong>pdf_info</strong><p>PDF 파일의 페이지 수 같은 기본 정보를 확인합니다.</p></article>
+        <article class="tool-card"><strong>pdf_merge</strong><p>여러 PDF를 지정한 순서대로 병합합니다.</p></article>
+        <article class="tool-card"><strong>pdf_split</strong><p><span class="inline-code">1-3, 5</span> 같은 범위로 필요한 페이지만 추출합니다.</p></article>
+        <article class="tool-card"><strong>pdf_reorder</strong><p>한 PDF 또는 여러 PDF의 페이지를 원하는 순서로 재배치합니다.</p></article>
+        <article class="tool-card"><strong>pdf_crop</strong><p>PDF 좌표를 기준으로 한 페이지의 특정 영역을 잘라냅니다.</p></article>
+        <article class="tool-card"><strong>office_to_pdf</strong><p>DOCX 또는 PPTX 파일의 텍스트를 기반으로 PDF를 생성합니다.</p></article>
+        <article class="tool-card"><strong>pdf_to_word</strong><p>PDF에서 추출 가능한 텍스트를 DOCX로 내보냅니다.</p></article>
+        <article class="tool-card"><strong>pdf_to_ppt</strong><p>PDF에서 추출 가능한 텍스트를 PPTX 슬라이드로 내보냅니다.</p></article>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>npm publish와 npx 실행의 의미</h2>
+      <p>npm에 패키지를 publish한다는 것은 인터넷 어딘가에 백엔드 서버를 계속 켜둔다는 뜻이 아닙니다. 실행 가능한 프로그램을 npm registry에 올려두는 것입니다. 실제 실행은 사용자의 PC에서 <span class="inline-code">npx</span>가 합니다.</p>
+      <pre><code>npx -y @drfirst/pdf-modify-mcp</code></pre>
+      <div class="flow" aria-label="npx flow">
+        <div class="flow-step"><span class="step-number">1</span><div><strong>사용자 또는 MCP 클라이언트가 npx 실행</strong><span>VS Code, Claude Desktop, Cursor 같은 클라이언트가 위 명령을 실행합니다.</span></div></div>
+        <div class="flow-step"><span class="step-number">2</span><div><strong>npm registry에서 패키지 다운로드</strong><span>패키지는 npm 캐시에 내려받아지고, 패키지의 bin 파일이 실행됩니다.</span></div></div>
+        <div class="flow-step"><span class="step-number">3</span><div><strong>사용자 PC에서 MCP 서버 시작</strong><span>Node.js 프로세스가 켜지고 표준입출력으로 MCP 메시지를 기다립니다.</span></div></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>JSON-RPC는 하나의 입구로 여러 작업을 부르는 방식</h2>
+      <p>REST API는 기능마다 endpoint를 나누는 경우가 많습니다. JSON-RPC는 하나의 통신 입구를 두고, 요청 본문의 <span class="inline-code">method</span>로 어떤 작업인지 알려줍니다. MCP는 JSON-RPC 위에서 <span class="inline-code">tools/list</span>, <span class="inline-code">tools/call</span> 같은 규칙을 정한 형태입니다.</p>
+      <div class="compare">
+        <article class="tool-card">
+          <strong>REST 방식</strong>
+          <pre><code>POST /api/pdf/merge
+POST /api/pdf/split
+POST /api/pdf/crop</code></pre>
+        </article>
+        <article class="tool-card">
+          <strong>JSON-RPC 방식</strong>
+          <pre><code>POST /rpc
+{
+  "method": "pdf_merge",
+  "params": { ... }
+}</code></pre>
+        </article>
+      </div>
+      <p class="note">MCP의 stdio transport에서는 HTTP endpoint도 없습니다. 대신 실행 중인 프로세스의 stdin/stdout으로 JSON-RPC 메시지가 오갑니다.</p>
+    </section>
+
+    <section class="section">
+      <h2>MCP에서 실제로 작업이 시작되는 순간</h2>
+      <p>MCP 서버는 먼저 실행되고 대기합니다. 그 후 LLM이 직접 npx에 파일 인자를 붙이는 것이 아니라, MCP 클라이언트가 JSON-RPC 메시지를 서버의 stdin으로 보냅니다.</p>
+      <pre><code>{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "method": "tools/call",
+  "params": {
+    "name": "pdf_merge",
+    "arguments": {
+      "inputPaths": [
+        "C:/Users/me/a.pdf",
+        "C:/Users/me/b.pdf"
+      ],
+      "outputPath": "C:/Users/me/merged.pdf"
+    }
+  }
+}</code></pre>
+      <div class="flow" aria-label="MCP tool call flow">
+        <div class="flow-step"><span class="step-number">1</span><div><strong>method 확인</strong><span>MCP SDK가 <span class="inline-code">tools/call</span> 요청임을 확인합니다.</span></div></div>
+        <div class="flow-step"><span class="step-number">2</span><div><strong>도구 이름 확인</strong><span><span class="inline-code">params.name</span>이 <span class="inline-code">pdf_merge</span>인지 확인합니다.</span></div></div>
+        <div class="flow-step"><span class="step-number">3</span><div><strong>등록된 handler 실행</strong><span>서버 코드의 <span class="inline-code">server.registerTool('pdf_merge', ...)</span> 핸들러가 실행됩니다.</span></div></div>
+        <div class="flow-step"><span class="step-number">4</span><div><strong>결과 응답</strong><span>PDF 병합 후 결과 파일 경로를 JSON-RPC 응답으로 돌려줍니다.</span></div></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>VS Code에서 쓰는 설정</h2>
+      <p>사용자는 MCP 클라이언트 설정에 npm 패키지를 실행하는 명령만 넣으면 됩니다. 그러면 클라이언트가 필요한 순간에 로컬 MCP 서버를 실행합니다.</p>
+      <pre><code>{
+  "servers": {
+    "pdf-modify-mcp": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@drfirst/pdf-modify-mcp"]
+    }
+  }
+}</code></pre>
+      <p class="note">이 설정의 args는 PDF 작업 인자가 아니라, MCP 서버를 시작하기 위한 npx 인자입니다. PDF 파일 경로와 결과 경로는 서버가 켜진 뒤 <span class="inline-code">tools/call</span>의 <span class="inline-code">arguments</span>로 전달됩니다.</p>
+    </section>
+
+    <section class="section">
+      <h2>stdin과 stdout을 아주 쉽게 이해하기</h2>
+      <p><span class="inline-code">stdin</span>과 <span class="inline-code">stdout</span>은 터미널 화면 자체가 아니라, 실행 중인 프로그램에 연결된 입력과 출력 통로입니다. 사람이 터미널에 직접 입력할 수도 있지만, MCP에서는 MCP 클라이언트가 이 통로를 잡고 JSON-RPC 메시지를 넣고 읽습니다.</p>
+      <div class="flow" aria-label="stdio simple flow">
+        <div class="flow-step"><span class="step-number">1</span><div><strong>MCP 클라이언트가 프로그램 실행</strong><span><span class="inline-code">npx -y @drfirst/pdf-modify-mcp</span>로 MCP 서버 프로세스를 켭니다.</span></div></div>
+        <div class="flow-step"><span class="step-number">2</span><div><strong>stdin으로 요청 입력</strong><span>클라이언트가 실행 중인 MCP 서버의 입력 통로에 <span class="inline-code">tools/call</span> JSON을 씁니다.</span></div></div>
+        <div class="flow-step"><span class="step-number">3</span><div><strong>MCP 서버가 작업 수행</strong><span>서버는 JSON 안의 도구 이름과 인자를 보고 PDF 병합, 분할, 크롭 같은 로컬 작업을 실행합니다.</span></div></div>
+        <div class="flow-step"><span class="step-number">4</span><div><strong>stdout으로 결과 출력</strong><span>서버는 결과 JSON을 출력 통로로 내보내고, MCP 클라이언트가 그것을 읽어 LLM에게 전달합니다.</span></div></div>
+      </div>
+      <div class="compare">
+        <div class="tool-card">
+          <strong>명령어 인자 방식</strong>
+          <pre><code>python main.py --arg1 input</code></pre>
+          <p>프로그램을 시작할 때 값을 한 번 넘기는 방식입니다. 이 값은 보통 <span class="inline-code">argv</span>로 읽습니다.</p>
+        </div>
+        <div class="tool-card">
+          <strong>stdin 방식</strong>
+          <pre><code>echo '{"method":"hello"}' | python main.py</code></pre>
+          <p>프로그램이 실행된 뒤 입력 통로로 데이터를 흘려보내는 방식입니다. MCP stdio는 이 방식에 가깝습니다.</p>
+        </div>
+      </div>
+      <p class="note">LLM이 터미널 화면에 나온 글자를 다시 읽는 것이 아닙니다. MCP 클라이언트가 MCP 서버 프로세스의 <span class="inline-code">stdin</span>과 <span class="inline-code">stdout</span> 파이프를 직접 연결해 JSON 메시지를 주고받습니다.</p>
+    </section>
+
+    <section class="section">
+      <h2>직접 테스트하고 싶을 때</h2>
+      <p>MCP 클라이언트 없이도 PowerShell에서 JSON lines를 pipe로 보내 간단히 테스트할 수 있습니다.</p>
+      <pre><code>@'
+{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"manual-test","version":"1.0.0"}}}
+{"jsonrpc":"2.0","method":"notifications/initialized","params":{}}
+{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}
+'@ | npx -y @drfirst/pdf-modify-mcp</code></pre>
+      <p>실제 도구 호출은 <span class="inline-code">tools/list</span> 대신 <span class="inline-code">tools/call</span>을 보내면 됩니다.</p>
+    </section>
+
+    <section class="section">
+      <h2>왜 이 구조가 PDF Modify와 잘 맞는가</h2>
+      <p>PDF Modify의 중요한 방향은 파일을 서버에 업로드하지 않는 것입니다. 웹사이트에서는 브라우저가 작업하고, MCP에서는 사용자의 PC에서 로컬 Node.js 프로세스가 작업합니다. npm은 프로그램을 배포하는 통로일 뿐이고, 실제 PDF 파일 처리는 사용자의 로컬 환경에서 일어납니다.</p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>PDF Modify MCP Guide</span>
+    <span>Local PDF automation with MCP, JSON-RPC, npm, and npx.</span>
+  </footer>
+</body>
+</html>
