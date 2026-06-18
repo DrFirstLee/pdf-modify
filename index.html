@@ -1,0 +1,1032 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PDF Master - Free Private PDF Split, Merge, Reorder, Crop Tool</title>
+  <meta name="description" content="PDF Master is a free browser-based PDF tool for splitting pages, merging files, reordering PDFs, and cropping selected pages. Files stay on your device and are not uploaded.">
+  <meta name="keywords" content="PDF Master, PDF split, PDF merge, PDF reorder, PDF crop, 무료 PDF 편집, PDF 병합, PDF 분할, recortar PDF, dividir PDF, PDF 結合, PDF 分割">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta name="googlebot" content="index, follow">
+  <meta name="theme-color" content="#f7f4ea">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="PDF Master - Private PDF Tools in Your Browser">
+  <meta property="og:description" content="Split, merge, reorder, and crop PDFs without uploading your files.">
+  <meta property="og:image" content="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='630' viewBox='0 0 1200 630'%3E%3Crect width='1200' height='630' fill='%23f7f4ea'/%3E%3Crect x='190' y='95' width='330' height='440' rx='14' fill='%23ffffff' stroke='%231d2939' stroke-width='6'/%3E%3Crect x='610' y='150' width='400' height='86' rx='12' fill='%23e8503a'/%3E%3Crect x='610' y='272' width='300' height='38' rx='9' fill='%230f766e'/%3E%3Crect x='610' y='344' width='340' height='38' rx='9' fill='%232563eb'/%3E%3Ctext x='245' y='350' font-family='Arial' font-size='72' font-weight='700' fill='%23e8503a'%3EPDF%3C/text%3E%3Ctext x='610' y='455' font-family='Arial' font-size='64' font-weight='700' fill='%231d2939'%3EMaster%3C/text%3E%3C/svg%3E">
+  <link rel="canonical" href="/">
+  <link rel="alternate" hreflang="ko" href="/?lang=ko">
+  <link rel="alternate" hreflang="en" href="/?lang=en">
+  <link rel="alternate" hreflang="es" href="/?lang=es">
+  <link rel="alternate" hreflang="ja" href="/?lang=ja">
+  <link rel="alternate" hreflang="x-default" href="/">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "PDF Master",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Any",
+    "description": "A private browser-based PDF utility for splitting, merging, reordering, and cropping PDF files.",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "featureList": ["PDF split", "PDF merge", "PDF reorder", "PDF crop", "Local browser processing"]
+  }
+  </script>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f7f4ea;
+      --surface: #ffffff;
+      --surface-soft: #fbfaf6;
+      --ink: #182230;
+      --muted: #667085;
+      --line: #d8d3c7;
+      --accent: #e8503a;
+      --accent-strong: #bf2f22;
+      --teal: #0f766e;
+      --blue: #2563eb;
+      --focus: #f6c347;
+      --shadow: 0 18px 45px rgba(24, 34, 48, 0.12);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      min-width: 320px;
+    }
+
+    button, input, select, textarea { font: inherit; }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.45;
+    }
+
+    a { color: inherit; }
+
+    .shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px clamp(16px, 4vw, 40px);
+      border-bottom: 1px solid rgba(24, 34, 48, 0.12);
+      background: rgba(247, 244, 234, 0.92);
+      backdrop-filter: blur(14px);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      min-width: max-content;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 7px;
+      color: #fff;
+      background: var(--accent);
+      box-shadow: 0 8px 18px rgba(232, 80, 58, 0.28);
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .lang-select, .ghost-btn, .primary-btn, .icon-btn {
+      min-height: 40px;
+      border-radius: 7px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--ink);
+    }
+
+    .lang-select {
+      padding: 0 12px;
+      min-width: 126px;
+    }
+
+    .ghost-btn, .primary-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 0 14px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .primary-btn {
+      color: #fff;
+      border-color: var(--accent);
+      background: var(--accent);
+    }
+
+    .primary-btn:hover { background: var(--accent-strong); }
+
+    .ghost-btn:hover, .icon-btn:hover, .lang-select:hover { border-color: #a9a195; }
+
+    .main {
+      width: min(1440px, 100%);
+      margin: 0 auto;
+      padding: 22px clamp(14px, 3vw, 34px) 48px;
+    }
+
+    .workbench {
+      display: grid;
+      grid-template-columns: minmax(285px, 380px) minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel, .tool-panel, .notice, .faq-item {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      box-shadow: 0 1px 0 rgba(24, 34, 48, 0.03);
+    }
+
+    .panel {
+      overflow: hidden;
+      position: sticky;
+      top: 78px;
+    }
+
+    .panel-head, .tool-head {
+      padding: 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .eyebrow {
+      margin: 0 0 7px;
+      color: var(--accent-strong);
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1 {
+      margin-bottom: 10px;
+      max-width: 720px;
+      font-size: clamp(2.15rem, 6vw, 5.3rem);
+      line-height: 0.95;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin-bottom: 8px;
+      font-size: clamp(1.4rem, 2.7vw, 2.1rem);
+      letter-spacing: 0;
+    }
+
+    h3 {
+      margin-bottom: 8px;
+      font-size: 1rem;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      margin-bottom: 0;
+      max-width: 760px;
+      color: var(--muted);
+      font-size: clamp(1rem, 1.8vw, 1.16rem);
+      line-height: 1.65;
+    }
+
+    .intro {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(240px, 390px);
+      gap: 18px;
+      align-items: stretch;
+      min-height: min(62vh, 650px);
+      padding: 22px 0 18px;
+    }
+
+    .intro-copy {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 420px;
+      padding: clamp(14px, 3vw, 26px) 0;
+    }
+
+    .quick-stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 26px;
+      max-width: 760px;
+    }
+
+    .stat {
+      min-height: 86px;
+      padding: 14px;
+      border-left: 4px solid var(--teal);
+      background: rgba(255, 255, 255, 0.72);
+      border-radius: 7px;
+    }
+
+    .stat strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 1.05rem;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.35;
+    }
+
+    .hero-visual {
+      position: relative;
+      display: grid;
+      place-items: center;
+      min-height: 420px;
+      overflow: hidden;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(248, 238, 217, 0.84)),
+        repeating-linear-gradient(90deg, rgba(24, 34, 48, 0.06) 0 1px, transparent 1px 34px);
+      box-shadow: var(--shadow);
+    }
+
+    .pdf-stack {
+      position: relative;
+      width: min(78%, 310px);
+      aspect-ratio: 0.74;
+    }
+
+    .pdf-page {
+      position: absolute;
+      inset: 0;
+      border-radius: 8px;
+      border: 2px solid #1d2939;
+      background: var(--surface);
+      box-shadow: 0 24px 38px rgba(24, 34, 48, 0.16);
+      transform-origin: 50% 90%;
+    }
+
+    .pdf-page:nth-child(1) { transform: rotate(-8deg) translate(-32px, 26px); opacity: 0.68; }
+    .pdf-page:nth-child(2) { transform: rotate(5deg) translate(30px, 14px); opacity: 0.82; }
+    .pdf-page:nth-child(3) { transform: rotate(0deg); }
+
+    .pdf-page::before {
+      content: "PDF";
+      position: absolute;
+      top: 22px;
+      left: 22px;
+      padding: 9px 12px;
+      border-radius: 6px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 900;
+    }
+
+    .pdf-line {
+      position: absolute;
+      left: 24px;
+      right: 24px;
+      height: 12px;
+      border-radius: 99px;
+      background: #dce4ef;
+    }
+
+    .pdf-line.one { top: 112px; width: 68%; }
+    .pdf-line.two { top: 148px; width: 82%; background: #c7d2fe; }
+    .pdf-line.three { top: 184px; width: 54%; background: #bfe6e1; }
+    .crop-frame {
+      position: absolute;
+      right: 34px;
+      bottom: 56px;
+      width: 48%;
+      height: 34%;
+      border: 3px dashed var(--teal);
+      border-radius: 6px;
+      background: rgba(15, 118, 110, 0.08);
+    }
+
+    .upload-zone {
+      display: grid;
+      place-items: center;
+      min-height: 208px;
+      margin: 18px;
+      padding: 24px;
+      border: 2px dashed #b9b1a6;
+      border-radius: 8px;
+      background: var(--surface-soft);
+      text-align: center;
+      transition: border-color 160ms ease, background 160ms ease;
+    }
+
+    .upload-zone.dragging {
+      border-color: var(--accent);
+      background: #fff6ef;
+    }
+
+    .upload-icon {
+      display: grid;
+      place-items: center;
+      width: 54px;
+      height: 54px;
+      margin: 0 auto 12px;
+      border-radius: 8px;
+      color: #fff;
+      background: var(--ink);
+    }
+
+    .upload-zone p {
+      margin-bottom: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .hidden-input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .file-list {
+      display: grid;
+      gap: 10px;
+      padding: 0 18px 18px;
+    }
+
+    .file-item {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      padding: 11px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fff;
+    }
+
+    .file-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-weight: 800;
+    }
+
+    .file-meta {
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .file-actions {
+      display: grid;
+      grid-template-columns: repeat(3, 34px);
+      gap: 6px;
+    }
+
+    .icon-btn {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      padding: 0;
+    }
+
+    .tools {
+      display: grid;
+      gap: 18px;
+    }
+
+    .tool-panel { overflow: hidden; }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      padding: 12px;
+      border-bottom: 1px solid var(--line);
+      background: var(--surface-soft);
+    }
+
+    .tab {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 42px;
+      padding: 0 10px;
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .tab.active {
+      border-color: var(--ink);
+      background: var(--surface);
+      color: var(--ink);
+    }
+
+    .tab-panel { display: none; padding: 18px; }
+    .tab-panel.active { display: block; }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin: 16px 0;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    .field.full { grid-column: 1 / -1; }
+
+    .field label {
+      color: #344054;
+      font-size: 0.88rem;
+      font-weight: 800;
+    }
+
+    .field input, .field select, .field textarea {
+      width: 100%;
+      min-height: 42px;
+      padding: 10px 11px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fff;
+      color: var(--ink);
+    }
+
+    .field textarea {
+      min-height: 82px;
+      resize: vertical;
+      line-height: 1.45;
+    }
+
+    .hint {
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.55;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .status {
+      min-height: 24px;
+      margin-top: 14px;
+      color: var(--muted);
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    .status.error { color: #b42318; }
+    .status.success { color: #027a48; }
+
+    .notice-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .notice {
+      padding: 16px;
+      min-height: 130px;
+    }
+
+    .notice svg {
+      margin-bottom: 10px;
+      color: var(--teal);
+    }
+
+    .notice p { margin-bottom: 0; color: var(--muted); line-height: 1.55; }
+
+    .content-section {
+      display: grid;
+      gap: 14px;
+      margin-top: 18px;
+      padding: 22px 0 0;
+    }
+
+    .faq-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .faq-item { padding: 16px; }
+    .faq-item p { margin-bottom: 0; color: var(--muted); line-height: 1.55; }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      padding: 24px clamp(16px, 4vw, 40px);
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      background: #efeadf;
+      font-size: 0.9rem;
+    }
+
+    [data-i18n] { overflow-wrap: anywhere; }
+
+    @media (max-width: 980px) {
+      .intro, .workbench { grid-template-columns: 1fr; }
+      .intro-copy { min-height: auto; }
+      .hero-visual { min-height: 330px; }
+      .panel { position: static; }
+      .notice-row { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 720px) {
+      .topbar { align-items: flex-start; }
+      .brand span:last-child { display: none; }
+      .nav { width: 100%; }
+      .lang-select { flex: 1; min-width: 130px; }
+      .quick-stats, .tabs, .form-grid, .faq-grid { grid-template-columns: 1fr; }
+      .tab { justify-content: flex-start; }
+      h1 { font-size: clamp(2rem, 15vw, 3.8rem); }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar" aria-label="Primary navigation">
+      <div class="brand" aria-label="PDF Master">
+        <span class="brand-mark"><i data-lucide="file-text"></i></span>
+        <span>PDF Master</span>
+      </div>
+      <nav class="nav">
+        <select id="languageSelect" class="lang-select" aria-label="Language">
+          <option value="ko">한국어</option>
+          <option value="en">English</option>
+          <option value="es">Español</option>
+          <option value="ja">日本語</option>
+        </select>
+        <a class="ghost-btn" href="#guide"><i data-lucide="book-open"></i><span data-i18n="navGuide">사용법</span></a>
+        <a class="primary-btn" href="#tool"><i data-lucide="upload"></i><span data-i18n="navStart">PDF 선택</span></a>
+      </nav>
+    </header>
+
+    <main class="main">
+      <section class="intro" aria-labelledby="pageTitle">
+        <div class="intro-copy">
+          <p class="eyebrow" data-i18n="eyebrow">브라우저에서 바로 처리</p>
+          <h1 id="pageTitle" data-i18n="title">PDF 편집을 빠르게, 파일은 내 기기에만.</h1>
+          <p class="lead" data-i18n="subtitle">PDF Master는 분할, 병합, 순서 변경, 크롭을 한 화면에서 처리하는 무료 PDF 도구입니다. 업로드 서버 없이 브라우저 내부에서 작업합니다.</p>
+          <div class="quick-stats" aria-label="PDF Master highlights">
+            <div class="stat"><strong data-i18n="statOneTitle">저장 없음</strong><span data-i18n="statOneText">선택한 PDF는 서버로 전송되지 않습니다.</span></div>
+            <div class="stat"><strong data-i18n="statTwoTitle">4개 언어</strong><span data-i18n="statTwoText">한국어, 영어, 스페인어, 일본어 UI를 제공합니다.</span></div>
+            <div class="stat"><strong data-i18n="statThreeTitle">무료 사용</strong><span data-i18n="statThreeText">광고 기반 운영을 고려한 안내형 페이지입니다.</span></div>
+          </div>
+        </div>
+        <div class="hero-visual" aria-hidden="true">
+          <div class="pdf-stack">
+            <div class="pdf-page"></div>
+            <div class="pdf-page"></div>
+            <div class="pdf-page">
+              <span class="pdf-line one"></span>
+              <span class="pdf-line two"></span>
+              <span class="pdf-line three"></span>
+              <span class="crop-frame"></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="tool" class="workbench" aria-label="PDF workbench">
+        <aside class="panel" aria-label="PDF files">
+          <div class="panel-head">
+            <p class="eyebrow" data-i18n="filesEyebrow">파일</p>
+            <h2 data-i18n="filesTitle">PDF 추가</h2>
+            <p class="hint" data-i18n="filesHint">여러 PDF를 선택하거나 이 영역에 끌어다 놓으세요.</p>
+          </div>
+          <label id="dropZone" class="upload-zone" for="fileInput">
+            <span class="upload-icon"><i data-lucide="folder-up"></i></span>
+            <strong data-i18n="dropTitle">PDF 파일 선택</strong>
+            <p data-i18n="dropText">파일은 브라우저 메모리에서만 열립니다.</p>
+            <span class="primary-btn"><i data-lucide="plus"></i><span data-i18n="dropButton">파일 추가</span></span>
+          </label>
+          <input id="fileInput" class="hidden-input" type="file" accept="application/pdf,.pdf" multiple>
+          <div id="fileList" class="file-list" aria-live="polite"></div>
+        </aside>
+
+        <div class="tools">
+          <section class="tool-panel" aria-label="PDF tools">
+            <div class="tool-head">
+              <p class="eyebrow" data-i18n="toolEyebrow">도구</p>
+              <h2 data-i18n="toolTitle">원하는 작업 선택</h2>
+              <p class="hint" data-i18n="toolHint">작업을 고르고 다운로드 버튼을 누르면 새 PDF가 생성됩니다.</p>
+            </div>
+            <div class="tabs" role="tablist" aria-label="PDF operation tabs">
+              <button class="tab active" type="button" data-tab="merge" role="tab" aria-selected="true"><i data-lucide="combine"></i><span data-i18n="tabMerge">병합</span></button>
+              <button class="tab" type="button" data-tab="split" role="tab" aria-selected="false"><i data-lucide="scissors"></i><span data-i18n="tabSplit">분할</span></button>
+              <button class="tab" type="button" data-tab="reorder" role="tab" aria-selected="false"><i data-lucide="arrow-up-down"></i><span data-i18n="tabReorder">순서</span></button>
+              <button class="tab" type="button" data-tab="crop" role="tab" aria-selected="false"><i data-lucide="crop"></i><span data-i18n="tabCrop">크롭</span></button>
+            </div>
+
+            <div id="merge" class="tab-panel active" role="tabpanel">
+              <h3 data-i18n="mergeTitle">여러 PDF를 하나로 병합</h3>
+              <p class="hint" data-i18n="mergeText">왼쪽 파일 목록의 순서대로 모든 페이지를 합칩니다. 화살표 버튼으로 순서를 바꿀 수 있습니다.</p>
+              <div class="actions">
+                <button id="mergeBtn" class="primary-btn" type="button"><i data-lucide="download"></i><span data-i18n="mergeButton">병합 PDF 다운로드</span></button>
+              </div>
+            </div>
+
+            <div id="split" class="tab-panel" role="tabpanel">
+              <h3 data-i18n="splitTitle">필요한 페이지만 추출</h3>
+              <p class="hint" data-i18n="splitText">예: 1-3, 5, 8-10. 첫 번째 PDF에서 지정한 페이지만 새 PDF로 만듭니다.</p>
+              <div class="form-grid">
+                <div class="field full">
+                  <label for="splitRanges" data-i18n="splitLabel">페이지 범위</label>
+                  <input id="splitRanges" type="text" placeholder="1-3, 5, 8-10">
+                </div>
+              </div>
+              <div class="actions">
+                <button id="splitBtn" class="primary-btn" type="button"><i data-lucide="download"></i><span data-i18n="splitButton">추출 PDF 다운로드</span></button>
+              </div>
+            </div>
+
+            <div id="reorder" class="tab-panel" role="tabpanel">
+              <h3 data-i18n="reorderTitle">PDF 내부 페이지 순서 변경</h3>
+              <p class="hint" data-i18n="reorderText">첫 번째 PDF의 페이지를 원하는 순서로 입력하세요. 예: 3, 1, 2, 4-6.</p>
+              <div class="form-grid">
+                <div class="field full">
+                  <label for="reorderRanges" data-i18n="reorderLabel">새 페이지 순서</label>
+                  <input id="reorderRanges" type="text" placeholder="3, 1, 2, 4-6">
+                </div>
+              </div>
+              <div class="actions">
+                <button id="reorderBtn" class="primary-btn" type="button"><i data-lucide="download"></i><span data-i18n="reorderButton">재정렬 PDF 다운로드</span></button>
+              </div>
+            </div>
+
+            <div id="crop" class="tab-panel" role="tabpanel">
+              <h3 data-i18n="cropTitle">페이지 가장자리 크롭</h3>
+              <p class="hint" data-i18n="cropText">첫 번째 PDF에서 선택한 페이지의 위, 오른쪽, 아래, 왼쪽 여백을 포인트 단위로 잘라냅니다. 72pt는 약 1인치입니다.</p>
+              <div class="form-grid">
+                <div class="field full">
+                  <label for="cropRanges" data-i18n="cropRangeLabel">적용할 페이지</label>
+                  <input id="cropRanges" type="text" placeholder="1-3, 5">
+                </div>
+                <div class="field"><label for="cropTop" data-i18n="cropTop">위</label><input id="cropTop" type="number" min="0" value="0"></div>
+                <div class="field"><label for="cropRight" data-i18n="cropRight">오른쪽</label><input id="cropRight" type="number" min="0" value="0"></div>
+                <div class="field"><label for="cropBottom" data-i18n="cropBottom">아래</label><input id="cropBottom" type="number" min="0" value="0"></div>
+                <div class="field"><label for="cropLeft" data-i18n="cropLeft">왼쪽</label><input id="cropLeft" type="number" min="0" value="0"></div>
+              </div>
+              <div class="actions">
+                <button id="cropBtn" class="primary-btn" type="button"><i data-lucide="download"></i><span data-i18n="cropButton">크롭 PDF 다운로드</span></button>
+              </div>
+            </div>
+            <div id="status" class="status" aria-live="polite"></div>
+          </section>
+
+          <section class="notice-row" aria-label="Privacy and safety notices">
+            <div class="notice"><i data-lucide="shield-check"></i><h3 data-i18n="privacyTitle">파일은 저장되지 않습니다</h3><p data-i18n="privacyText">PDF Master는 선택한 파일을 서버에 업로드하지 않고, 브라우저에서만 처리합니다.</p></div>
+            <div class="notice"><i data-lucide="wifi-off"></i><h3 data-i18n="offlineTitle">처리 후 흔적 최소화</h3><p data-i18n="offlineText">페이지를 새로고침하거나 닫으면 선택한 파일 목록과 작업 상태가 사라집니다.</p></div>
+            <div class="notice"><i data-lucide="badge-help"></i><h3 data-i18n="safeTitle">명확한 사용 안내</h3><p data-i18n="safeText">광고 게재 정책에 맞게 기능, 제한, 개인정보 처리 방식을 사용자에게 분명히 안내합니다.</p></div>
+          </section>
+
+        </div>
+      </section>
+
+      <section id="guide" class="content-section" aria-labelledby="guideTitle">
+        <p class="eyebrow" data-i18n="guideEyebrow">가이드</p>
+        <h2 id="guideTitle" data-i18n="guideTitle">PDF Master 사용 방법</h2>
+        <div class="faq-grid">
+          <article class="faq-item"><h3 data-i18n="faqOneTitle">PDF 병합</h3><p data-i18n="faqOneText">여러 파일을 추가한 뒤 파일 목록의 위아래 버튼으로 순서를 정하고 병합 다운로드를 누릅니다.</p></article>
+          <article class="faq-item"><h3 data-i18n="faqTwoTitle">PDF 분할</h3><p data-i18n="faqTwoText">첫 번째 PDF를 기준으로 필요한 페이지 범위를 입력하면 해당 페이지만 새 파일로 저장됩니다.</p></article>
+          <article class="faq-item"><h3 data-i18n="faqThreeTitle">순서 변경</h3><p data-i18n="faqThreeText">페이지 번호를 원하는 순서대로 입력하면 내부 페이지 순서가 바뀐 PDF를 받을 수 있습니다.</p></article>
+          <article class="faq-item"><h3 data-i18n="faqFourTitle">크롭</h3><p data-i18n="faqFourText">잘라낼 여백 값을 포인트 단위로 입력합니다. 원본 파일은 수정되지 않고 새 파일만 생성됩니다.</p></article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>PDF Master</span>
+      <span data-i18n="footerText">Free private PDF tools. No server upload. No file storage.</span>
+    </footer>
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  <script>
+    const translations = {
+      ko: {
+        navGuide: '사용법', navStart: 'PDF 선택', eyebrow: '브라우저에서 바로 처리', title: 'PDF 편집을 빠르게, 파일은 내 기기에만.', subtitle: 'PDF Master는 분할, 병합, 순서 변경, 크롭을 한 화면에서 처리하는 무료 PDF 도구입니다. 업로드 서버 없이 브라우저 내부에서 작업합니다.',
+        statOneTitle: '저장 없음', statOneText: '선택한 PDF는 서버로 전송되지 않습니다.', statTwoTitle: '4개 언어', statTwoText: '한국어, 영어, 스페인어, 일본어 UI를 제공합니다.', statThreeTitle: '무료 사용', statThreeText: '광고 기반 운영을 고려한 안내형 페이지입니다.',
+        filesEyebrow: '파일', filesTitle: 'PDF 추가', filesHint: '여러 PDF를 선택하거나 이 영역에 끌어다 놓으세요.', dropTitle: 'PDF 파일 선택', dropText: '파일은 브라우저 메모리에서만 열립니다.', dropButton: '파일 추가',
+        toolEyebrow: '도구', toolTitle: '원하는 작업 선택', toolHint: '작업을 고르고 다운로드 버튼을 누르면 새 PDF가 생성됩니다.', tabMerge: '병합', tabSplit: '분할', tabReorder: '순서', tabCrop: '크롭',
+        mergeTitle: '여러 PDF를 하나로 병합', mergeText: '왼쪽 파일 목록의 순서대로 모든 페이지를 합칩니다. 화살표 버튼으로 순서를 바꿀 수 있습니다.', mergeButton: '병합 PDF 다운로드',
+        splitTitle: '필요한 페이지만 추출', splitText: '예: 1-3, 5, 8-10. 첫 번째 PDF에서 지정한 페이지만 새 PDF로 만듭니다.', splitLabel: '페이지 범위', splitButton: '추출 PDF 다운로드',
+        reorderTitle: 'PDF 내부 페이지 순서 변경', reorderText: '첫 번째 PDF의 페이지를 원하는 순서로 입력하세요. 예: 3, 1, 2, 4-6.', reorderLabel: '새 페이지 순서', reorderButton: '재정렬 PDF 다운로드',
+        cropTitle: '페이지 가장자리 크롭', cropText: '첫 번째 PDF에서 선택한 페이지의 위, 오른쪽, 아래, 왼쪽 여백을 포인트 단위로 잘라냅니다. 72pt는 약 1인치입니다.', cropRangeLabel: '적용할 페이지', cropTop: '위', cropRight: '오른쪽', cropBottom: '아래', cropLeft: '왼쪽', cropButton: '크롭 PDF 다운로드',
+        privacyTitle: '파일은 저장되지 않습니다', privacyText: 'PDF Master는 선택한 파일을 서버에 업로드하지 않고, 브라우저에서만 처리합니다.', offlineTitle: '처리 후 흔적 최소화', offlineText: '페이지를 새로고침하거나 닫으면 선택한 파일 목록과 작업 상태가 사라집니다.', safeTitle: '명확한 사용 안내', safeText: '광고 게재 정책에 맞게 기능, 제한, 개인정보 처리 방식을 사용자에게 분명히 안내합니다.',
+        guideEyebrow: '가이드', guideTitle: 'PDF Master 사용 방법',
+        faqOneTitle: 'PDF 병합', faqOneText: '여러 파일을 추가한 뒤 파일 목록의 위아래 버튼으로 순서를 정하고 병합 다운로드를 누릅니다.', faqTwoTitle: 'PDF 분할', faqTwoText: '첫 번째 PDF를 기준으로 필요한 페이지 범위를 입력하면 해당 페이지만 새 파일로 저장됩니다.', faqThreeTitle: '순서 변경', faqThreeText: '페이지 번호를 원하는 순서대로 입력하면 내부 페이지 순서가 바뀐 PDF를 받을 수 있습니다.', faqFourTitle: '크롭', faqFourText: '잘라낼 여백 값을 포인트 단위로 입력합니다. 원본 파일은 수정되지 않고 새 파일만 생성됩니다.',
+        footerText: '무료 비공개 PDF 도구. 서버 업로드 없음. 파일 저장 없음.', ready: 'PDF를 추가하면 작업을 시작할 수 있습니다.', processing: 'PDF를 처리하는 중입니다...', done: '완료되었습니다. 다운로드가 시작됩니다.', needFiles: '먼저 PDF 파일을 추가하세요.', needTwo: '병합하려면 PDF를 두 개 이상 추가하세요.', invalidRange: '페이지 범위를 확인하세요.', invalidCrop: '크롭 값이 페이지 크기보다 큽니다.', loading: '읽는 중', pages: '페이지', remove: '삭제', moveUp: '위로', moveDown: '아래로'
+      },
+      en: {
+        navGuide: 'Guide', navStart: 'Choose PDF', eyebrow: 'Processed in your browser', title: 'Fast PDF editing. Your files stay on your device.', subtitle: 'PDF Master is a free one-page PDF tool for splitting, merging, reordering, and cropping documents without server uploads.',
+        statOneTitle: 'No storage', statOneText: 'Selected PDFs are not sent to a server.', statTwoTitle: '4 languages', statTwoText: 'Korean, English, Spanish, and Japanese UI.', statThreeTitle: 'Free to use', statThreeText: 'Clear guidance for an ad-supported model.',
+        filesEyebrow: 'Files', filesTitle: 'Add PDFs', filesHint: 'Choose multiple PDFs or drop them here.', dropTitle: 'Choose PDF files', dropText: 'Files open only in browser memory.', dropButton: 'Add files',
+        toolEyebrow: 'Tools', toolTitle: 'Choose an action', toolHint: 'Pick a task and download the new PDF.', tabMerge: 'Merge', tabSplit: 'Split', tabReorder: 'Order', tabCrop: 'Crop',
+        mergeTitle: 'Merge PDFs into one file', mergeText: 'All pages are combined in the order shown in the file list. Use arrow buttons to reorder files.', mergeButton: 'Download merged PDF',
+        splitTitle: 'Extract only the pages you need', splitText: 'Example: 1-3, 5, 8-10. The first PDF is used as the source.', splitLabel: 'Page range', splitButton: 'Download extracted PDF',
+        reorderTitle: 'Reorder pages inside a PDF', reorderText: 'Enter the page order for the first PDF. Example: 3, 1, 2, 4-6.', reorderLabel: 'New page order', reorderButton: 'Download reordered PDF',
+        cropTitle: 'Crop page edges', cropText: 'Crop the top, right, bottom, and left margins of selected pages in points. 72pt is about 1 inch.', cropRangeLabel: 'Pages to crop', cropTop: 'Top', cropRight: 'Right', cropBottom: 'Bottom', cropLeft: 'Left', cropButton: 'Download cropped PDF',
+        privacyTitle: 'Files are not stored', privacyText: 'PDF Master works in your browser and does not upload selected files to a server.', offlineTitle: 'State clears naturally', offlineText: 'Refresh or close the page and the selected file list disappears.', safeTitle: 'Clear user guidance', safeText: 'The page clearly explains features, limits, and privacy for ad policy readiness.',
+        guideEyebrow: 'Guide', guideTitle: 'How to use PDF Master',
+        faqOneTitle: 'Merge PDFs', faqOneText: 'Add files, arrange them with the arrow buttons, then download the merged PDF.', faqTwoTitle: 'Split PDF', faqTwoText: 'Enter page ranges for the first PDF and save only those pages as a new file.', faqThreeTitle: 'Reorder pages', faqThreeText: 'Type page numbers in the desired order to create a reordered PDF.', faqFourTitle: 'Crop', faqFourText: 'Enter margins in points. The original file is not changed; a new file is created.',
+        footerText: 'Free private PDF tools. No server upload. No file storage.', ready: 'Add a PDF to start.', processing: 'Processing PDF...', done: 'Done. Your download is starting.', needFiles: 'Add a PDF file first.', needTwo: 'Add at least two PDFs to merge.', invalidRange: 'Check the page range.', invalidCrop: 'Crop values are larger than the page size.', loading: 'Loading', pages: 'pages', remove: 'Remove', moveUp: 'Move up', moveDown: 'Move down'
+      },
+      es: {
+        navGuide: 'Guía', navStart: 'Elegir PDF', eyebrow: 'Procesado en tu navegador', title: 'Edita PDF rápido. Tus archivos se quedan en tu dispositivo.', subtitle: 'PDF Master es una herramienta gratuita para dividir, unir, ordenar y recortar PDF sin subir archivos a un servidor.',
+        statOneTitle: 'Sin almacenamiento', statOneText: 'Los PDF seleccionados no se envían a un servidor.', statTwoTitle: '4 idiomas', statTwoText: 'Interfaz en coreano, inglés, español y japonés.', statThreeTitle: 'Gratis', statThreeText: 'Página clara para un modelo con anuncios.',
+        filesEyebrow: 'Archivos', filesTitle: 'Agregar PDF', filesHint: 'Elige varios PDF o arrástralos aquí.', dropTitle: 'Elegir archivos PDF', dropText: 'Los archivos se abren solo en la memoria del navegador.', dropButton: 'Agregar archivos',
+        toolEyebrow: 'Herramientas', toolTitle: 'Elige una acción', toolHint: 'Selecciona una tarea y descarga el nuevo PDF.', tabMerge: 'Unir', tabSplit: 'Dividir', tabReorder: 'Orden', tabCrop: 'Recortar',
+        mergeTitle: 'Unir varios PDF', mergeText: 'Todas las páginas se combinan en el orden de la lista. Usa las flechas para cambiarlo.', mergeButton: 'Descargar PDF unido',
+        splitTitle: 'Extraer páginas necesarias', splitText: 'Ejemplo: 1-3, 5, 8-10. Se usa el primer PDF como origen.', splitLabel: 'Rango de páginas', splitButton: 'Descargar PDF extraído',
+        reorderTitle: 'Cambiar el orden de páginas', reorderText: 'Escribe el nuevo orden del primer PDF. Ejemplo: 3, 1, 2, 4-6.', reorderLabel: 'Nuevo orden', reorderButton: 'Descargar PDF ordenado',
+        cropTitle: 'Recortar bordes', cropText: 'Recorta márgenes superior, derecho, inferior e izquierdo en puntos. 72pt equivale aprox. a 1 pulgada.', cropRangeLabel: 'Páginas', cropTop: 'Arriba', cropRight: 'Derecha', cropBottom: 'Abajo', cropLeft: 'Izquierda', cropButton: 'Descargar PDF recortado',
+        privacyTitle: 'No guardamos archivos', privacyText: 'PDF Master trabaja en tu navegador y no sube tus archivos a un servidor.', offlineTitle: 'El estado se borra', offlineText: 'Al actualizar o cerrar la página desaparece la lista de archivos.', safeTitle: 'Guía clara', safeText: 'La página explica funciones, límites y privacidad para estar lista para anuncios.',
+        guideEyebrow: 'Guía', guideTitle: 'Cómo usar PDF Master',
+        faqOneTitle: 'Unir PDF', faqOneText: 'Agrega archivos, ordénalos con flechas y descarga el PDF unido.', faqTwoTitle: 'Dividir PDF', faqTwoText: 'Introduce rangos del primer PDF para guardar solo esas páginas.', faqThreeTitle: 'Ordenar páginas', faqThreeText: 'Escribe los números en el orden deseado para crear un PDF reorganizado.', faqFourTitle: 'Recortar', faqFourText: 'Introduce márgenes en puntos. El archivo original no cambia; se crea uno nuevo.',
+        footerText: 'Herramientas PDF privadas y gratis. Sin subida ni almacenamiento.', ready: 'Agrega un PDF para comenzar.', processing: 'Procesando PDF...', done: 'Listo. La descarga está comenzando.', needFiles: 'Agrega primero un PDF.', needTwo: 'Agrega al menos dos PDF para unir.', invalidRange: 'Revisa el rango de páginas.', invalidCrop: 'Los valores de recorte son mayores que la página.', loading: 'Cargando', pages: 'páginas', remove: 'Eliminar', moveUp: 'Subir', moveDown: 'Bajar'
+      },
+      ja: {
+        navGuide: '使い方', navStart: 'PDFを選択', eyebrow: 'ブラウザ内で処理', title: 'PDF編集をすばやく。ファイルは端末の中だけ。', subtitle: 'PDF Masterは、分割、結合、並べ替え、トリミングを1ページで行える無料PDFツールです。サーバーへアップロードしません。',
+        statOneTitle: '保存なし', statOneText: '選択したPDFはサーバーへ送信されません。', statTwoTitle: '4言語', statTwoText: '韓国語、英語、スペイン語、日本語に対応。', statThreeTitle: '無料', statThreeText: '広告運営を想定した明確な案内ページです。',
+        filesEyebrow: 'ファイル', filesTitle: 'PDFを追加', filesHint: '複数のPDFを選択、またはここにドロップしてください。', dropTitle: 'PDFファイルを選択', dropText: 'ファイルはブラウザのメモリ内だけで開きます。', dropButton: 'ファイル追加',
+        toolEyebrow: 'ツール', toolTitle: '操作を選択', toolHint: '作業を選んで新しいPDFをダウンロードします。', tabMerge: '結合', tabSplit: '分割', tabReorder: '順序', tabCrop: '切り抜き',
+        mergeTitle: '複数PDFを1つに結合', mergeText: '左のファイル一覧の順番で全ページを結合します。矢印ボタンで順序を変更できます。', mergeButton: '結合PDFをダウンロード',
+        splitTitle: '必要なページだけ抽出', splitText: '例: 1-3, 5, 8-10。最初のPDFから指定ページだけを新しいPDFにします。', splitLabel: 'ページ範囲', splitButton: '抽出PDFをダウンロード',
+        reorderTitle: 'PDF内のページ順序を変更', reorderText: '最初のPDFのページ順を入力してください。例: 3, 1, 2, 4-6。', reorderLabel: '新しいページ順', reorderButton: '並べ替えPDFをダウンロード',
+        cropTitle: 'ページ端を切り抜き', cropText: '選択ページの上、右、下、左の余白をポイント単位で切り抜きます。72ptは約1インチです。', cropRangeLabel: '対象ページ', cropTop: '上', cropRight: '右', cropBottom: '下', cropLeft: '左', cropButton: '切り抜きPDFをダウンロード',
+        privacyTitle: 'ファイルは保存されません', privacyText: 'PDF Masterはブラウザ内で動作し、選択ファイルをサーバーへアップロードしません。', offlineTitle: '状態は残りません', offlineText: 'ページを更新または閉じると、選択ファイル一覧と作業状態は消えます。', safeTitle: '明確な案内', safeText: '広告ポリシーに配慮し、機能、制限、プライバシーを明確に説明します。',
+        guideEyebrow: 'ガイド', guideTitle: 'PDF Masterの使い方',
+        faqOneTitle: 'PDF結合', faqOneText: 'ファイルを追加し、矢印で順番を整えて結合PDFをダウンロードします。', faqTwoTitle: 'PDF分割', faqTwoText: '最初のPDFを基準にページ範囲を入力し、そのページだけを保存します。', faqThreeTitle: 'ページ順序変更', faqThreeText: '希望する順序でページ番号を入力すると、並べ替えたPDFを作成できます。', faqFourTitle: '切り抜き', faqFourText: '余白をポイント単位で入力します。元ファイルは変更されず、新しいファイルだけ作成されます。',
+        footerText: '無料のプライベートPDFツール。サーバーアップロードなし。ファイル保存なし。', ready: 'PDFを追加すると開始できます。', processing: 'PDFを処理中...', done: '完了しました。ダウンロードを開始します。', needFiles: '先にPDFを追加してください。', needTwo: '結合には2つ以上のPDFが必要です。', invalidRange: 'ページ範囲を確認してください。', invalidCrop: '切り抜き値がページサイズより大きいです。', loading: '読み込み中', pages: 'ページ', remove: '削除', moveUp: '上へ', moveDown: '下へ'
+      }
+    };
+
+    function detectDefaultLanguage() {
+      const requestedLang = new URLSearchParams(location.search).get('lang');
+      if (translations[requestedLang]) return requestedLang;
+
+      const browserLanguages = navigator.languages?.length ? navigator.languages : [navigator.language];
+      for (const language of browserLanguages) {
+        const lang = String(language || '').toLowerCase();
+        if (lang.startsWith('ko')) return 'ko';
+        if (lang.startsWith('en')) return 'en';
+        if (lang.startsWith('es')) return 'es';
+        if (lang.startsWith('ja')) return 'ja';
+      }
+      return 'en';
+    }
+
+    const state = { files: [], lang: detectDefaultLanguage() };
+    const elements = {
+      languageSelect: document.querySelector('#languageSelect'), fileInput: document.querySelector('#fileInput'), dropZone: document.querySelector('#dropZone'), fileList: document.querySelector('#fileList'), status: document.querySelector('#status'),
+      splitRanges: document.querySelector('#splitRanges'), reorderRanges: document.querySelector('#reorderRanges'), cropRanges: document.querySelector('#cropRanges'), cropTop: document.querySelector('#cropTop'), cropRight: document.querySelector('#cropRight'), cropBottom: document.querySelector('#cropBottom'), cropLeft: document.querySelector('#cropLeft')
+    };
+
+    function text(key) {
+      return translations[state.lang]?.[key] || translations.ko[key] || key;
+    }
+
+    function setLanguage(lang) {
+      state.lang = translations[lang] ? lang : 'ko';
+      document.documentElement.lang = state.lang;
+      elements.languageSelect.value = state.lang;
+      document.querySelectorAll('[data-i18n]').forEach((node) => { node.textContent = text(node.dataset.i18n); });
+      renderFiles();
+      setStatus(text('ready'));
+      const url = new URL(location.href);
+      url.searchParams.set('lang', state.lang);
+      history.replaceState(null, '', url);
+    }
+
+    function setStatus(message, type = '') {
+      elements.status.textContent = message;
+      elements.status.className = `status ${type}`.trim();
+    }
+
+    function formatBytes(bytes) {
+      if (!bytes) return '0 KB';
+      const units = ['B', 'KB', 'MB', 'GB'];
+      const index = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
+      return `${(bytes / Math.pow(1024, index)).toFixed(index ? 1 : 0)} ${units[index]}`;
+    }
+
+    async function addFiles(fileList) {
+      const pdfFiles = [...fileList].filter((file) => file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf'));
+      for (const file of pdfFiles) {
+        const bytes = await file.arrayBuffer();
+        const pdf = await PDFLib.PDFDocument.load(bytes, { ignoreEncryption: true });
+        state.files.push({ id: crypto.randomUUID(), name: file.name, size: file.size, bytes, pageCount: pdf.getPageCount() });
+      }
+      renderFiles();
+      setStatus(pdfFiles.length ? text('ready') : text('needFiles'), pdfFiles.length ? '' : 'error');
+    }
+
+    function renderFiles() {
+      elements.fileList.innerHTML = '';
+      state.files.forEach((file, index) => {
+        const item = document.createElement('div');
+        item.className = 'file-item';
+        item.innerHTML = `
+          <div>
+            <div class="file-name" title="${escapeHtml(file.name)}">${escapeHtml(file.name)}</div>
+            <div class="file-meta">${file.pageCount || text('loading')} ${text('pages')} · ${formatBytes(file.size)}</div>
+          </div>
+          <div class="file-actions">
+            <button class="icon-btn" type="button" title="${text('moveUp')}" aria-label="${text('moveUp')}" data-action="up" data-index="${index}"><i data-lucide="arrow-up"></i></button>
+            <button class="icon-btn" type="button" title="${text('moveDown')}" aria-label="${text('moveDown')}" data-action="down" data-index="${index}"><i data-lucide="arrow-down"></i></button>
+            <button class="icon-btn" type="button" title="${text('remove')}" aria-label="${text('remove')}" data-action="remove" data-index="${index}"><i data-lucide="trash-2"></i></button>
+          </div>`;
+        elements.fileList.appendChild(item);
+      });
+      lucide.createIcons();
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
+    }
+
+    function parseRanges(input, maxPages) {
+      const cleaned = input.trim();
+      if (!cleaned) return Array.from({ length: maxPages }, (_, index) => index);
+      const pages = [];
+      for (const part of cleaned.split(',')) {
+        const segment = part.trim();
+        if (!segment) continue;
+        const match = segment.match(/^(\d+)(?:\s*-\s*(\d+))?$/);
+        if (!match) throw new Error(text('invalidRange'));
+        const start = Number(match[1]);
+        const end = Number(match[2] || match[1]);
+        if (start < 1 || end < 1 || start > maxPages || end > maxPages) throw new Error(text('invalidRange'));
+        const step = start <= end ? 1 : -1;
+        for (let page = start; step > 0 ? page <= end : page >= end; page += step) pages.push(page - 1);
+      }
+      if (!pages.length) throw new Error(text('invalidRange'));
+      return pages;
+    }
+
+    async function loadFirstPdf() {
+      if (!state.files.length) throw new Error(text('needFiles'));
+      return PDFLib.PDFDocument.load(state.files[0].bytes, { ignoreEncryption: true });
+    }
+
+    async function mergePdfs() {
+      if (state.files.length < 2) throw new Error(text('needTwo'));
+      const output = await PDFLib.PDFDocument.create();
+      for (const file of state.files) {
+        const source = await PDFLib.PDFDocument.load(file.bytes, { ignoreEncryption: true });
+        const pages = await output.copyPages(source, source.getPageIndices());
+        pages.forEach((page) => output.addPage(page));
+      }
+      return output.save();
+    }
+
+    async function splitPdf() {
+      const source = await loadFirstPdf();
+      const pages = parseRanges(elements.splitRanges.value, source.getPageCount());
+      const output = await PDFLib.PDFDocument.create();
+      const copied = await output.copyPages(source, pages);
+      copied.forEach((page) => output.addPage(page));
+      return output.save();
+    }
+
+    async function reorderPdf() {
+      const source = await loadFirstPdf();
+      const pages = parseRanges(elements.reorderRanges.value, source.getPageCount());
+      const output = await PDFLib.PDFDocument.create();
+      const copied = await output.copyPages(source, pages);
+      copied.forEach((page) => output.addPage(page));
+      return output.save();
+    }
+
+    async function cropPdf() {
+      const source = await loadFirstPdf();
+      const selected = new Set(parseRanges(elements.cropRanges.value, source.getPageCount()));
+      const output = await PDFLib.PDFDocument.create();
+      const copied = await output.copyPages(source, source.getPageIndices());
+      const top = Number(elements.cropTop.value || 0);
+      const right = Number(elements.cropRight.value || 0);
+      const bottom = Number(elements.cropBottom.value || 0);
+      const left = Number(elements.cropLeft.value || 0);
+      copied.forEach((page, index) => {
+        if (selected.has(index)) {
+          const { width, height } = page.getSize();
+          const cropWidth = width - left - right;
+          const cropHeight = height - top - bottom;
+          if (cropWidth <= 0 || cropHeight <= 0) throw new Error(text('invalidCrop'));
+          page.setCropBox(left, bottom, cropWidth, cropHeight);
+          page.setMediaBox(left, bottom, cropWidth, cropHeight);
+        }
+        output.addPage(page);
+      });
+      return output.save();
+    }
+
+    async function runTask(task, filename) {
+      try {
+        setStatus(text('processing'));
+        const bytes = await task();
+        const blob = new Blob([bytes], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        link.click();
+        URL.revokeObjectURL(url);
+        setStatus(text('done'), 'success');
+      } catch (error) {
+        setStatus(error.message || text('invalidRange'), 'error');
+      }
+    }
+
+    elements.fileInput.addEventListener('change', (event) => addFiles(event.target.files));
+    elements.languageSelect.addEventListener('change', (event) => setLanguage(event.target.value));
+    elements.dropZone.addEventListener('dragover', (event) => { event.preventDefault(); elements.dropZone.classList.add('dragging'); });
+    elements.dropZone.addEventListener('dragleave', () => elements.dropZone.classList.remove('dragging'));
+    elements.dropZone.addEventListener('drop', (event) => { event.preventDefault(); elements.dropZone.classList.remove('dragging'); addFiles(event.dataTransfer.files); });
+
+    elements.fileList.addEventListener('click', (event) => {
+      const button = event.target.closest('button[data-action]');
+      if (!button) return;
+      const index = Number(button.dataset.index);
+      const action = button.dataset.action;
+      if (action === 'remove') state.files.splice(index, 1);
+      if (action === 'up' && index > 0) [state.files[index - 1], state.files[index]] = [state.files[index], state.files[index - 1]];
+      if (action === 'down' && index < state.files.length - 1) [state.files[index + 1], state.files[index]] = [state.files[index], state.files[index + 1]];
+      renderFiles();
+    });
+
+    document.querySelectorAll('.tab').forEach((tab) => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach((item) => { item.classList.remove('active'); item.setAttribute('aria-selected', 'false'); });
+        document.querySelectorAll('.tab-panel').forEach((panel) => panel.classList.remove('active'));
+        tab.classList.add('active');
+        tab.setAttribute('aria-selected', 'true');
+        document.querySelector(`#${tab.dataset.tab}`).classList.add('active');
+      });
+    });
+
+    document.querySelector('#mergeBtn').addEventListener('click', () => runTask(mergePdfs, 'pdf-master-merged.pdf'));
+    document.querySelector('#splitBtn').addEventListener('click', () => runTask(splitPdf, 'pdf-master-split.pdf'));
+    document.querySelector('#reorderBtn').addEventListener('click', () => runTask(reorderPdf, 'pdf-master-reordered.pdf'));
+    document.querySelector('#cropBtn').addEventListener('click', () => runTask(cropPdf, 'pdf-master-cropped.pdf'));
+
+    window.addEventListener('beforeunload', () => { state.files = []; });
+    lucide.createIcons();
+    setLanguage(state.lang);
+  </script>
+</body>
+</html>
