@@ -435,7 +435,7 @@
 
     .tabs {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(5, minmax(0, 1fr));
       gap: 8px;
       padding: 12px;
       border-bottom: 1px solid var(--line);
@@ -527,6 +527,114 @@
     .status.error { color: #b42318; }
     .status.success { color: #027a48; }
 
+    .preview-panel {
+      padding: 18px;
+      border-top: 1px solid var(--line);
+      background: #fffdf8;
+    }
+
+    .preview-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .preview-head h3 { margin-bottom: 4px; }
+
+    .preview-meta {
+      min-width: max-content;
+      color: var(--muted);
+      font-size: 0.88rem;
+      font-weight: 800;
+    }
+
+    .page-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 12px;
+      max-height: 560px;
+      overflow: auto;
+      padding: 2px;
+    }
+
+    .page-tile {
+      position: relative;
+      display: grid;
+      gap: 8px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--ink);
+      text-align: left;
+      user-select: none;
+    }
+
+    .page-tile.selected {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14);
+    }
+
+    .page-tile.crop-active {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.16);
+    }
+
+    .page-canvas-wrap {
+      position: relative;
+      display: grid;
+      place-items: center;
+      min-height: 188px;
+      overflow: hidden;
+      border-radius: 6px;
+      background: #ece7dc;
+    }
+
+    .page-canvas-wrap canvas {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      box-shadow: 0 8px 20px rgba(24, 34, 48, 0.12);
+    }
+
+    .crop-selection {
+      position: absolute;
+      display: none;
+      border: 2px solid var(--teal);
+      background: rgba(15, 118, 110, 0.18);
+      pointer-events: none;
+    }
+
+    .page-tile.has-crop .crop-selection { display: block; }
+
+    .page-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 0.88rem;
+      font-weight: 800;
+    }
+
+    .page-label span:last-child {
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .preview-empty {
+      display: grid;
+      place-items: center;
+      min-height: 180px;
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.55;
+      background: var(--surface);
+    }
+
     .notice-row {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -573,6 +681,21 @@
       font-size: 0.9rem;
     }
 
+    .footer-links {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .footer-link {
+      font-weight: 800;
+      text-decoration: none;
+      color: var(--ink);
+    }
+
+    .footer-link:hover { text-decoration: underline; }
+
     [data-i18n] { overflow-wrap: anywhere; }
 
     @media (max-width: 980px) {
@@ -589,6 +712,7 @@
       .nav { width: 100%; }
       .lang-select { flex: 1; min-width: 130px; }
       .quick-stats, .tabs, .form-grid, .faq-grid { grid-template-columns: 1fr; }
+      .preview-head { display: grid; }
       .tab { justify-content: flex-start; }
       h1 { font-size: clamp(2rem, 15vw, 3.8rem); }
     }
@@ -652,7 +776,7 @@
             <p data-i18n="dropText">파일은 브라우저 메모리에서만 열립니다.</p>
             <span class="primary-btn"><i data-lucide="plus"></i><span data-i18n="dropButton">파일 추가</span></span>
           </label>
-          <input id="fileInput" class="hidden-input" type="file" accept="application/pdf,.pdf" multiple>
+          <input id="fileInput" class="hidden-input" type="file" accept="application/pdf,.pdf,.docx,.pptx" multiple>
           <div id="fileList" class="file-list" aria-live="polite"></div>
         </aside>
 
@@ -668,6 +792,7 @@
               <button class="tab" type="button" data-tab="split" role="tab" aria-selected="false"><i data-lucide="scissors"></i><span data-i18n="tabSplit">분할</span></button>
               <button class="tab" type="button" data-tab="reorder" role="tab" aria-selected="false"><i data-lucide="arrow-up-down"></i><span data-i18n="tabReorder">순서</span></button>
               <button class="tab" type="button" data-tab="crop" role="tab" aria-selected="false"><i data-lucide="crop"></i><span data-i18n="tabCrop">크롭</span></button>
+              <button class="tab" type="button" data-tab="convert" role="tab" aria-selected="false"><i data-lucide="file-output"></i><span data-i18n="tabConvert">변환</span></button>
             </div>
 
             <div id="merge" class="tab-panel active" role="tabpanel">
@@ -680,7 +805,7 @@
 
             <div id="split" class="tab-panel" role="tabpanel">
               <h3 data-i18n="splitTitle">필요한 페이지만 추출</h3>
-              <p class="hint" data-i18n="splitText">예: 1-3, 5, 8-10. 첫 번째 PDF에서 지정한 페이지만 새 PDF로 만듭니다.</p>
+              <p class="hint" data-i18n="splitText">아래 미리보기에서 필요한 페이지를 클릭하세요. 직접 입력하려면 예: 1-3, 5, 8-10 형식도 사용할 수 있습니다.</p>
               <div class="form-grid">
                 <div class="field full">
                   <label for="splitRanges" data-i18n="splitLabel">페이지 범위</label>
@@ -707,29 +832,42 @@
             </div>
 
             <div id="crop" class="tab-panel" role="tabpanel">
-              <h3 data-i18n="cropTitle">페이지 가장자리 크롭</h3>
-              <p class="hint" data-i18n="cropText">첫 번째 PDF에서 선택한 페이지의 위, 오른쪽, 아래, 왼쪽 여백을 포인트 단위로 잘라냅니다. 72pt는 약 1인치입니다.</p>
-              <div class="form-grid">
-                <div class="field full">
-                  <label for="cropRanges" data-i18n="cropRangeLabel">적용할 페이지</label>
-                  <input id="cropRanges" type="text" placeholder="1-3, 5">
-                </div>
-                <div class="field"><label for="cropTop" data-i18n="cropTop">위</label><input id="cropTop" type="number" min="0" value="0"></div>
-                <div class="field"><label for="cropRight" data-i18n="cropRight">오른쪽</label><input id="cropRight" type="number" min="0" value="0"></div>
-                <div class="field"><label for="cropBottom" data-i18n="cropBottom">아래</label><input id="cropBottom" type="number" min="0" value="0"></div>
-                <div class="field"><label for="cropLeft" data-i18n="cropLeft">왼쪽</label><input id="cropLeft" type="number" min="0" value="0"></div>
-              </div>
+              <h3 data-i18n="cropTitle">마우스로 영역 선택</h3>
+              <p class="hint" data-i18n="cropText">아래 미리보기에서 크롭할 페이지 위를 마우스로 드래그하세요. 선택한 사각형 영역만 새 PDF로 저장됩니다.</p>
               <div class="actions">
+                <button id="clearCropBtn" class="ghost-btn" type="button"><i data-lucide="eraser"></i><span data-i18n="clearCropButton">크롭 선택 지우기</span></button>
                 <button id="cropBtn" class="primary-btn" type="button"><i data-lucide="download"></i><span data-i18n="cropButton">크롭 PDF 다운로드</span></button>
               </div>
             </div>
+
+            <div id="convert" class="tab-panel" role="tabpanel">
+              <h3 data-i18n="convertTitle">PDF를 Word 또는 PPT로 저장</h3>
+              <p class="hint" data-i18n="convertText">첫 번째 PDF를 Word 문서 또는 PPT 프레젠테이션으로 내보냅니다. Word는 텍스트 중심, PPT는 각 페이지를 슬라이드 이미지로 저장합니다.</p>
+              <div class="actions">
+                <button id="exportWordBtn" class="ghost-btn" type="button"><i data-lucide="file-text"></i><span data-i18n="exportWordButton">Word로 저장</span></button>
+                <button id="exportPptBtn" class="primary-btn" type="button"><i data-lucide="presentation"></i><span data-i18n="exportPptButton">PPT로 저장</span></button>
+              </div>
+            </div>
             <div id="status" class="status" aria-live="polite"></div>
+
+            <section class="preview-panel" aria-label="PDF page preview">
+              <div class="preview-head">
+                <div>
+                  <h3 data-i18n="previewTitle">페이지 미리보기</h3>
+                  <p class="hint" data-i18n="previewText">첫 번째 PDF의 페이지를 확인하고, 분할할 페이지를 클릭하거나 크롭 탭에서 드래그하세요.</p>
+                </div>
+                <div id="previewMeta" class="preview-meta"></div>
+              </div>
+              <div id="pagePreview" class="page-grid">
+                <div class="preview-empty" data-i18n="previewEmpty">PDF를 추가하면 페이지가 여기에 표시됩니다.</div>
+              </div>
+            </section>
           </section>
 
           <section class="notice-row" aria-label="Privacy and safety notices">
             <div class="notice"><i data-lucide="shield-check"></i><h3 data-i18n="privacyTitle">파일은 저장되지 않습니다</h3><p data-i18n="privacyText">PDF Master는 선택한 파일을 서버에 업로드하지 않고, 브라우저에서만 처리합니다.</p></div>
             <div class="notice"><i data-lucide="wifi-off"></i><h3 data-i18n="offlineTitle">처리 후 흔적 최소화</h3><p data-i18n="offlineText">페이지를 새로고침하거나 닫으면 선택한 파일 목록과 작업 상태가 사라집니다.</p></div>
-            <div class="notice"><i data-lucide="badge-help"></i><h3 data-i18n="safeTitle">명확한 사용 안내</h3><p data-i18n="safeText">광고 게재 정책에 맞게 기능, 제한, 개인정보 처리 방식을 사용자에게 분명히 안내합니다.</p></div>
+            <div class="notice"><i data-lucide="badge-help"></i><h3 data-i18n="safeTitle">Word/PPT도 로컬 변환</h3><p data-i18n="safeText">.docx와 .pptx는 브라우저에서 PDF로 변환한 뒤 같은 도구로 작업합니다. 오래된 .doc/.ppt는 먼저 최신 형식으로 저장해 주세요.</p></div>
           </section>
 
         </div>
@@ -749,11 +887,18 @@
 
     <footer class="footer">
       <span>PDF Master</span>
-      <span data-i18n="footerText">Free private PDF tools. No server upload. No file storage.</span>
+      <span class="footer-links">
+        <span data-i18n="footerText">Free private PDF tools. No server upload. No file storage.</span>
+        <a id="privacyLink" class="footer-link" href="privacy.html" data-i18n="privacyLink">개인정보처리방침</a>
+      </span>
     </footer>
   </div>
 
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://unpkg.com/mammoth@1.8.0/mammoth.browser.min.js"></script>
+  <script src="https://unpkg.com/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
   <script>
     const translations = {
@@ -761,57 +906,65 @@
         navGuide: '사용법', navStart: 'PDF 선택', eyebrow: '브라우저에서 바로 처리', title: 'PDF 편집을 빠르게, 파일은 내 기기에만.', subtitle: 'PDF Master는 분할, 병합, 순서 변경, 크롭을 한 화면에서 처리하는 무료 PDF 도구입니다. 업로드 서버 없이 브라우저 내부에서 작업합니다.',
         statOneTitle: '저장 없음', statOneText: '선택한 PDF는 서버로 전송되지 않습니다.', statTwoTitle: '4개 언어', statTwoText: '한국어, 영어, 스페인어, 일본어 UI를 제공합니다.', statThreeTitle: '무료 사용', statThreeText: '광고 기반 운영을 고려한 안내형 페이지입니다.',
         filesEyebrow: '파일', filesTitle: 'PDF 추가', filesHint: '여러 PDF를 선택하거나 이 영역에 끌어다 놓으세요.', dropTitle: 'PDF 파일 선택', dropText: '파일은 브라우저 메모리에서만 열립니다.', dropButton: '파일 추가',
-        toolEyebrow: '도구', toolTitle: '원하는 작업 선택', toolHint: '작업을 고르고 다운로드 버튼을 누르면 새 PDF가 생성됩니다.', tabMerge: '병합', tabSplit: '분할', tabReorder: '순서', tabCrop: '크롭',
+        toolEyebrow: '도구', toolTitle: '원하는 작업 선택', toolHint: '작업을 고르고 다운로드 버튼을 누르면 새 PDF가 생성됩니다.', tabMerge: '병합', tabSplit: '분할', tabReorder: '순서', tabCrop: '크롭', tabConvert: '변환',
         mergeTitle: '여러 PDF를 하나로 병합', mergeText: '왼쪽 파일 목록의 순서대로 모든 페이지를 합칩니다. 화살표 버튼으로 순서를 바꿀 수 있습니다.', mergeButton: '병합 PDF 다운로드',
-        splitTitle: '필요한 페이지만 추출', splitText: '예: 1-3, 5, 8-10. 첫 번째 PDF에서 지정한 페이지만 새 PDF로 만듭니다.', splitLabel: '페이지 범위', splitButton: '추출 PDF 다운로드',
+        splitTitle: '필요한 페이지만 추출', splitText: '아래 미리보기에서 필요한 페이지를 클릭하세요. 직접 입력하려면 예: 1-3, 5, 8-10 형식도 사용할 수 있습니다.', splitLabel: '페이지 범위', splitButton: '추출 PDF 다운로드',
         reorderTitle: 'PDF 내부 페이지 순서 변경', reorderText: '첫 번째 PDF의 페이지를 원하는 순서로 입력하세요. 예: 3, 1, 2, 4-6.', reorderLabel: '새 페이지 순서', reorderButton: '재정렬 PDF 다운로드',
-        cropTitle: '페이지 가장자리 크롭', cropText: '첫 번째 PDF에서 선택한 페이지의 위, 오른쪽, 아래, 왼쪽 여백을 포인트 단위로 잘라냅니다. 72pt는 약 1인치입니다.', cropRangeLabel: '적용할 페이지', cropTop: '위', cropRight: '오른쪽', cropBottom: '아래', cropLeft: '왼쪽', cropButton: '크롭 PDF 다운로드',
-        privacyTitle: '파일은 저장되지 않습니다', privacyText: 'PDF Master는 선택한 파일을 서버에 업로드하지 않고, 브라우저에서만 처리합니다.', offlineTitle: '처리 후 흔적 최소화', offlineText: '페이지를 새로고침하거나 닫으면 선택한 파일 목록과 작업 상태가 사라집니다.', safeTitle: '명확한 사용 안내', safeText: '광고 게재 정책에 맞게 기능, 제한, 개인정보 처리 방식을 사용자에게 분명히 안내합니다.',
+        cropTitle: '마우스로 영역 선택', cropText: '아래 미리보기에서 크롭할 페이지 위를 마우스로 드래그하세요. 선택한 사각형 영역만 새 PDF로 저장됩니다.', clearCropButton: '크롭 선택 지우기', cropButton: '크롭 PDF 다운로드',
+        convertTitle: 'PDF를 Word 또는 PPT로 저장', convertText: '첫 번째 PDF를 Word 문서 또는 PPT 프레젠테이션으로 내보냅니다. Word는 텍스트 중심, PPT는 각 페이지를 슬라이드 이미지로 저장합니다.', exportWordButton: 'Word로 저장', exportPptButton: 'PPT로 저장',
+        privacyTitle: '파일은 저장되지 않습니다', privacyText: 'PDF Master는 선택한 파일을 서버에 업로드하지 않고, 브라우저에서만 처리합니다.', offlineTitle: '처리 후 흔적 최소화', offlineText: '페이지를 새로고침하거나 닫으면 선택한 파일 목록과 작업 상태가 사라집니다.', safeTitle: 'Word/PPT도 로컬 변환', safeText: '.docx와 .pptx는 브라우저에서 PDF로 변환한 뒤 같은 도구로 작업합니다. 오래된 .doc/.ppt는 먼저 최신 형식으로 저장해 주세요.',
         guideEyebrow: '가이드', guideTitle: 'PDF Master 사용 방법',
-        faqOneTitle: 'PDF 병합', faqOneText: '여러 파일을 추가한 뒤 파일 목록의 위아래 버튼으로 순서를 정하고 병합 다운로드를 누릅니다.', faqTwoTitle: 'PDF 분할', faqTwoText: '첫 번째 PDF를 기준으로 필요한 페이지 범위를 입력하면 해당 페이지만 새 파일로 저장됩니다.', faqThreeTitle: '순서 변경', faqThreeText: '페이지 번호를 원하는 순서대로 입력하면 내부 페이지 순서가 바뀐 PDF를 받을 수 있습니다.', faqFourTitle: '크롭', faqFourText: '잘라낼 여백 값을 포인트 단위로 입력합니다. 원본 파일은 수정되지 않고 새 파일만 생성됩니다.',
-        footerText: '무료 비공개 PDF 도구. 서버 업로드 없음. 파일 저장 없음.', ready: 'PDF를 추가하면 작업을 시작할 수 있습니다.', processing: 'PDF를 처리하는 중입니다...', done: '완료되었습니다. 다운로드가 시작됩니다.', needFiles: '먼저 PDF 파일을 추가하세요.', needTwo: '병합하려면 PDF를 두 개 이상 추가하세요.', invalidRange: '페이지 범위를 확인하세요.', invalidCrop: '크롭 값이 페이지 크기보다 큽니다.', loading: '읽는 중', pages: '페이지', remove: '삭제', moveUp: '위로', moveDown: '아래로'
+        faqOneTitle: 'PDF 병합', faqOneText: '여러 파일을 추가한 뒤 파일 목록의 위아래 버튼으로 순서를 정하고 병합 다운로드를 누릅니다.', faqTwoTitle: 'PDF 분할', faqTwoText: '첫 번째 PDF를 기준으로 미리보기에서 페이지를 선택하거나 범위를 입력하면 해당 페이지만 새 파일로 저장됩니다.', faqThreeTitle: '순서 변경', faqThreeText: '페이지 번호를 원하는 순서대로 입력하면 내부 페이지 순서가 바뀐 PDF를 받을 수 있습니다.', faqFourTitle: '크롭', faqFourText: '미리보기 위에서 마우스로 영역을 드래그합니다. 원본 파일은 수정되지 않고 선택 영역만 새 파일로 생성됩니다.',
+        previewTitle: '페이지 미리보기', previewText: '첫 번째 PDF의 페이지를 확인하고, 분할할 페이지를 클릭하거나 크롭 탭에서 드래그하세요.', previewEmpty: 'PDF를 추가하면 페이지가 여기에 표시됩니다.', previewRendering: '페이지를 렌더링하는 중입니다...', previewError: 'PDF 미리보기를 만들 수 없습니다.', pageLabel: '페이지', clickSelectHint: '클릭 선택', dragCropHint: '드래그', selectedPages: '선택한 페이지:', needCropSelection: '먼저 미리보기에서 크롭할 영역을 드래그하세요.', cropSelected: '크롭 영역 선택됨: 페이지',
+        footerText: '무료 비공개 PDF 도구. 서버 업로드 없음. 파일 저장 없음.', privacyLink: '개인정보처리방침', ready: 'PDF를 추가하면 작업을 시작할 수 있습니다.', processing: 'PDF를 처리하는 중입니다...', converting: '파일을 PDF로 변환하는 중입니다...', exporting: '파일을 내보내는 중입니다...', done: '완료되었습니다. 다운로드가 시작됩니다.', convertedFrom: 'PDF로 변환됨', unsupportedFile: '지원 파일을 확인하세요. PDF, DOCX, PPTX를 사용할 수 있습니다.', needFiles: '먼저 PDF 파일을 추가하세요.', needTwo: '병합하려면 PDF를 두 개 이상 추가하세요.', invalidRange: '페이지 범위를 확인하세요.', invalidCrop: '크롭 영역을 확인하세요.', loading: '읽는 중', pages: '페이지', remove: '삭제', moveUp: '위로', moveDown: '아래로'
       },
       en: {
         navGuide: 'Guide', navStart: 'Choose PDF', eyebrow: 'Processed in your browser', title: 'Fast PDF editing. Your files stay on your device.', subtitle: 'PDF Master is a free one-page PDF tool for splitting, merging, reordering, and cropping documents without server uploads.',
         statOneTitle: 'No storage', statOneText: 'Selected PDFs are not sent to a server.', statTwoTitle: '4 languages', statTwoText: 'Korean, English, Spanish, and Japanese UI.', statThreeTitle: 'Free to use', statThreeText: 'Clear guidance for an ad-supported model.',
         filesEyebrow: 'Files', filesTitle: 'Add PDFs', filesHint: 'Choose multiple PDFs or drop them here.', dropTitle: 'Choose PDF files', dropText: 'Files open only in browser memory.', dropButton: 'Add files',
-        toolEyebrow: 'Tools', toolTitle: 'Choose an action', toolHint: 'Pick a task and download the new PDF.', tabMerge: 'Merge', tabSplit: 'Split', tabReorder: 'Order', tabCrop: 'Crop',
+        toolEyebrow: 'Tools', toolTitle: 'Choose an action', toolHint: 'Pick a task and download the new PDF.', tabMerge: 'Merge', tabSplit: 'Split', tabReorder: 'Order', tabCrop: 'Crop', tabConvert: 'Convert',
         mergeTitle: 'Merge PDFs into one file', mergeText: 'All pages are combined in the order shown in the file list. Use arrow buttons to reorder files.', mergeButton: 'Download merged PDF',
-        splitTitle: 'Extract only the pages you need', splitText: 'Example: 1-3, 5, 8-10. The first PDF is used as the source.', splitLabel: 'Page range', splitButton: 'Download extracted PDF',
+        splitTitle: 'Extract only the pages you need', splitText: 'Click pages in the preview below. You can also type a range like 1-3, 5, 8-10.', splitLabel: 'Page range', splitButton: 'Download extracted PDF',
         reorderTitle: 'Reorder pages inside a PDF', reorderText: 'Enter the page order for the first PDF. Example: 3, 1, 2, 4-6.', reorderLabel: 'New page order', reorderButton: 'Download reordered PDF',
-        cropTitle: 'Crop page edges', cropText: 'Crop the top, right, bottom, and left margins of selected pages in points. 72pt is about 1 inch.', cropRangeLabel: 'Pages to crop', cropTop: 'Top', cropRight: 'Right', cropBottom: 'Bottom', cropLeft: 'Left', cropButton: 'Download cropped PDF',
-        privacyTitle: 'Files are not stored', privacyText: 'PDF Master works in your browser and does not upload selected files to a server.', offlineTitle: 'State clears naturally', offlineText: 'Refresh or close the page and the selected file list disappears.', safeTitle: 'Clear user guidance', safeText: 'The page clearly explains features, limits, and privacy for ad policy readiness.',
+        cropTitle: 'Select an area with your mouse', cropText: 'Drag on a page in the preview below. Only the selected rectangle is saved as a new PDF.', clearCropButton: 'Clear crop selection', cropButton: 'Download cropped PDF',
+        convertTitle: 'Save PDF as Word or PPT', convertText: 'Export the first PDF as a Word document or PowerPoint presentation. Word export is text-focused; PPT export saves each PDF page as a slide image.', exportWordButton: 'Save as Word', exportPptButton: 'Save as PPT',
+        privacyTitle: 'Files are not stored', privacyText: 'PDF Master works in your browser and does not upload selected files to a server.', offlineTitle: 'State clears naturally', offlineText: 'Refresh or close the page and the selected file list disappears.', safeTitle: 'Local Word/PPT conversion', safeText: '.docx and .pptx files are converted to PDF in your browser, then handled by the same tools. Please save older .doc/.ppt files as modern formats first.',
         guideEyebrow: 'Guide', guideTitle: 'How to use PDF Master',
-        faqOneTitle: 'Merge PDFs', faqOneText: 'Add files, arrange them with the arrow buttons, then download the merged PDF.', faqTwoTitle: 'Split PDF', faqTwoText: 'Enter page ranges for the first PDF and save only those pages as a new file.', faqThreeTitle: 'Reorder pages', faqThreeText: 'Type page numbers in the desired order to create a reordered PDF.', faqFourTitle: 'Crop', faqFourText: 'Enter margins in points. The original file is not changed; a new file is created.',
-        footerText: 'Free private PDF tools. No server upload. No file storage.', ready: 'Add a PDF to start.', processing: 'Processing PDF...', done: 'Done. Your download is starting.', needFiles: 'Add a PDF file first.', needTwo: 'Add at least two PDFs to merge.', invalidRange: 'Check the page range.', invalidCrop: 'Crop values are larger than the page size.', loading: 'Loading', pages: 'pages', remove: 'Remove', moveUp: 'Move up', moveDown: 'Move down'
+        faqOneTitle: 'Merge PDFs', faqOneText: 'Add files, arrange them with the arrow buttons, then download the merged PDF.', faqTwoTitle: 'Split PDF', faqTwoText: 'Select pages in the preview or enter a range, then save only those pages as a new file.', faqThreeTitle: 'Reorder pages', faqThreeText: 'Type page numbers in the desired order to create a reordered PDF.', faqFourTitle: 'Crop', faqFourText: 'Drag an area on the page preview. The original file is not changed; only the selected area becomes a new file.',
+        previewTitle: 'Page preview', previewText: 'Review the first PDF, click pages to split, or drag in the Crop tab.', previewEmpty: 'Add a PDF and its pages will appear here.', previewRendering: 'Rendering pages...', previewError: 'Could not create a PDF preview.', pageLabel: 'Page', clickSelectHint: 'Click', dragCropHint: 'Drag', selectedPages: 'Selected pages:', needCropSelection: 'Drag an area in the preview first.', cropSelected: 'Crop area selected: page',
+        footerText: 'Free private PDF tools. No server upload. No file storage.', privacyLink: 'Privacy Policy', ready: 'Add a PDF to start.', processing: 'Processing PDF...', converting: 'Converting file to PDF...', exporting: 'Exporting file...', done: 'Done. Your download is starting.', convertedFrom: 'Converted to PDF', unsupportedFile: 'Check the file type. PDF, DOCX, and PPTX are supported.', needFiles: 'Add a PDF file first.', needTwo: 'Add at least two PDFs to merge.', invalidRange: 'Check the page range.', invalidCrop: 'Check the crop area.', loading: 'Loading', pages: 'pages', remove: 'Remove', moveUp: 'Move up', moveDown: 'Move down'
       },
       es: {
         navGuide: 'Guía', navStart: 'Elegir PDF', eyebrow: 'Procesado en tu navegador', title: 'Edita PDF rápido. Tus archivos se quedan en tu dispositivo.', subtitle: 'PDF Master es una herramienta gratuita para dividir, unir, ordenar y recortar PDF sin subir archivos a un servidor.',
         statOneTitle: 'Sin almacenamiento', statOneText: 'Los PDF seleccionados no se envían a un servidor.', statTwoTitle: '4 idiomas', statTwoText: 'Interfaz en coreano, inglés, español y japonés.', statThreeTitle: 'Gratis', statThreeText: 'Página clara para un modelo con anuncios.',
         filesEyebrow: 'Archivos', filesTitle: 'Agregar PDF', filesHint: 'Elige varios PDF o arrástralos aquí.', dropTitle: 'Elegir archivos PDF', dropText: 'Los archivos se abren solo en la memoria del navegador.', dropButton: 'Agregar archivos',
-        toolEyebrow: 'Herramientas', toolTitle: 'Elige una acción', toolHint: 'Selecciona una tarea y descarga el nuevo PDF.', tabMerge: 'Unir', tabSplit: 'Dividir', tabReorder: 'Orden', tabCrop: 'Recortar',
+        toolEyebrow: 'Herramientas', toolTitle: 'Elige una acción', toolHint: 'Selecciona una tarea y descarga el nuevo PDF.', tabMerge: 'Unir', tabSplit: 'Dividir', tabReorder: 'Orden', tabCrop: 'Recortar', tabConvert: 'Convertir',
         mergeTitle: 'Unir varios PDF', mergeText: 'Todas las páginas se combinan en el orden de la lista. Usa las flechas para cambiarlo.', mergeButton: 'Descargar PDF unido',
-        splitTitle: 'Extraer páginas necesarias', splitText: 'Ejemplo: 1-3, 5, 8-10. Se usa el primer PDF como origen.', splitLabel: 'Rango de páginas', splitButton: 'Descargar PDF extraído',
+        splitTitle: 'Extraer páginas necesarias', splitText: 'Haz clic en páginas de la vista previa. También puedes escribir un rango como 1-3, 5, 8-10.', splitLabel: 'Rango de páginas', splitButton: 'Descargar PDF extraído',
         reorderTitle: 'Cambiar el orden de páginas', reorderText: 'Escribe el nuevo orden del primer PDF. Ejemplo: 3, 1, 2, 4-6.', reorderLabel: 'Nuevo orden', reorderButton: 'Descargar PDF ordenado',
-        cropTitle: 'Recortar bordes', cropText: 'Recorta márgenes superior, derecho, inferior e izquierdo en puntos. 72pt equivale aprox. a 1 pulgada.', cropRangeLabel: 'Páginas', cropTop: 'Arriba', cropRight: 'Derecha', cropBottom: 'Abajo', cropLeft: 'Izquierda', cropButton: 'Descargar PDF recortado',
-        privacyTitle: 'No guardamos archivos', privacyText: 'PDF Master trabaja en tu navegador y no sube tus archivos a un servidor.', offlineTitle: 'El estado se borra', offlineText: 'Al actualizar o cerrar la página desaparece la lista de archivos.', safeTitle: 'Guía clara', safeText: 'La página explica funciones, límites y privacidad para estar lista para anuncios.',
+        cropTitle: 'Selecciona un área con el mouse', cropText: 'Arrastra sobre una página en la vista previa. Solo el rectángulo seleccionado se guarda como PDF nuevo.', clearCropButton: 'Borrar selección', cropButton: 'Descargar PDF recortado',
+        convertTitle: 'Guardar PDF como Word o PPT', convertText: 'Exporta el primer PDF como documento Word o presentación PowerPoint. Word se centra en texto; PPT guarda cada página como imagen de diapositiva.', exportWordButton: 'Guardar como Word', exportPptButton: 'Guardar como PPT',
+        privacyTitle: 'No guardamos archivos', privacyText: 'PDF Master trabaja en tu navegador y no sube tus archivos a un servidor.', offlineTitle: 'El estado se borra', offlineText: 'Al actualizar o cerrar la página desaparece la lista de archivos.', safeTitle: 'Conversión local Word/PPT', safeText: 'Los archivos .docx y .pptx se convierten a PDF en tu navegador y luego usan las mismas herramientas. Guarda .doc/.ppt antiguos como formatos modernos primero.',
         guideEyebrow: 'Guía', guideTitle: 'Cómo usar PDF Master',
-        faqOneTitle: 'Unir PDF', faqOneText: 'Agrega archivos, ordénalos con flechas y descarga el PDF unido.', faqTwoTitle: 'Dividir PDF', faqTwoText: 'Introduce rangos del primer PDF para guardar solo esas páginas.', faqThreeTitle: 'Ordenar páginas', faqThreeText: 'Escribe los números en el orden deseado para crear un PDF reorganizado.', faqFourTitle: 'Recortar', faqFourText: 'Introduce márgenes en puntos. El archivo original no cambia; se crea uno nuevo.',
-        footerText: 'Herramientas PDF privadas y gratis. Sin subida ni almacenamiento.', ready: 'Agrega un PDF para comenzar.', processing: 'Procesando PDF...', done: 'Listo. La descarga está comenzando.', needFiles: 'Agrega primero un PDF.', needTwo: 'Agrega al menos dos PDF para unir.', invalidRange: 'Revisa el rango de páginas.', invalidCrop: 'Los valores de recorte son mayores que la página.', loading: 'Cargando', pages: 'páginas', remove: 'Eliminar', moveUp: 'Subir', moveDown: 'Bajar'
+        faqOneTitle: 'Unir PDF', faqOneText: 'Agrega archivos, ordénalos con flechas y descarga el PDF unido.', faqTwoTitle: 'Dividir PDF', faqTwoText: 'Selecciona páginas en la vista previa o introduce un rango para guardar solo esas páginas.', faqThreeTitle: 'Ordenar páginas', faqThreeText: 'Escribe los números en el orden deseado para crear un PDF reorganizado.', faqFourTitle: 'Recortar', faqFourText: 'Arrastra un área en la vista previa. El archivo original no cambia; solo el área seleccionada se crea como archivo nuevo.',
+        previewTitle: 'Vista previa', previewText: 'Revisa el primer PDF, haz clic para dividir o arrastra en la pestaña Recortar.', previewEmpty: 'Agrega un PDF y sus páginas aparecerán aquí.', previewRendering: 'Renderizando páginas...', previewError: 'No se pudo crear la vista previa.', pageLabel: 'Página', clickSelectHint: 'Clic', dragCropHint: 'Arrastra', selectedPages: 'Páginas seleccionadas:', needCropSelection: 'Primero arrastra un área en la vista previa.', cropSelected: 'Área seleccionada: página',
+        footerText: 'Herramientas PDF privadas y gratis. Sin subida ni almacenamiento.', privacyLink: 'Política de privacidad', ready: 'Agrega un PDF para comenzar.', processing: 'Procesando PDF...', converting: 'Convirtiendo archivo a PDF...', exporting: 'Exportando archivo...', done: 'Listo. La descarga está comenzando.', convertedFrom: 'Convertido a PDF', unsupportedFile: 'Revisa el tipo de archivo. Se admiten PDF, DOCX y PPTX.', needFiles: 'Agrega primero un PDF.', needTwo: 'Agrega al menos dos PDF para unir.', invalidRange: 'Revisa el rango de páginas.', invalidCrop: 'Revisa el área de recorte.', loading: 'Cargando', pages: 'páginas', remove: 'Eliminar', moveUp: 'Subir', moveDown: 'Bajar'
       },
       ja: {
         navGuide: '使い方', navStart: 'PDFを選択', eyebrow: 'ブラウザ内で処理', title: 'PDF編集をすばやく。ファイルは端末の中だけ。', subtitle: 'PDF Masterは、分割、結合、並べ替え、トリミングを1ページで行える無料PDFツールです。サーバーへアップロードしません。',
         statOneTitle: '保存なし', statOneText: '選択したPDFはサーバーへ送信されません。', statTwoTitle: '4言語', statTwoText: '韓国語、英語、スペイン語、日本語に対応。', statThreeTitle: '無料', statThreeText: '広告運営を想定した明確な案内ページです。',
         filesEyebrow: 'ファイル', filesTitle: 'PDFを追加', filesHint: '複数のPDFを選択、またはここにドロップしてください。', dropTitle: 'PDFファイルを選択', dropText: 'ファイルはブラウザのメモリ内だけで開きます。', dropButton: 'ファイル追加',
-        toolEyebrow: 'ツール', toolTitle: '操作を選択', toolHint: '作業を選んで新しいPDFをダウンロードします。', tabMerge: '結合', tabSplit: '分割', tabReorder: '順序', tabCrop: '切り抜き',
+        toolEyebrow: 'ツール', toolTitle: '操作を選択', toolHint: '作業を選んで新しいPDFをダウンロードします。', tabMerge: '結合', tabSplit: '分割', tabReorder: '順序', tabCrop: '切り抜き', tabConvert: '変換',
         mergeTitle: '複数PDFを1つに結合', mergeText: '左のファイル一覧の順番で全ページを結合します。矢印ボタンで順序を変更できます。', mergeButton: '結合PDFをダウンロード',
-        splitTitle: '必要なページだけ抽出', splitText: '例: 1-3, 5, 8-10。最初のPDFから指定ページだけを新しいPDFにします。', splitLabel: 'ページ範囲', splitButton: '抽出PDFをダウンロード',
+        splitTitle: '必要なページだけ抽出', splitText: '下のプレビューで必要なページをクリックしてください。1-3, 5, 8-10 のように範囲入力もできます。', splitLabel: 'ページ範囲', splitButton: '抽出PDFをダウンロード',
         reorderTitle: 'PDF内のページ順序を変更', reorderText: '最初のPDFのページ順を入力してください。例: 3, 1, 2, 4-6。', reorderLabel: '新しいページ順', reorderButton: '並べ替えPDFをダウンロード',
-        cropTitle: 'ページ端を切り抜き', cropText: '選択ページの上、右、下、左の余白をポイント単位で切り抜きます。72ptは約1インチです。', cropRangeLabel: '対象ページ', cropTop: '上', cropRight: '右', cropBottom: '下', cropLeft: '左', cropButton: '切り抜きPDFをダウンロード',
-        privacyTitle: 'ファイルは保存されません', privacyText: 'PDF Masterはブラウザ内で動作し、選択ファイルをサーバーへアップロードしません。', offlineTitle: '状態は残りません', offlineText: 'ページを更新または閉じると、選択ファイル一覧と作業状態は消えます。', safeTitle: '明確な案内', safeText: '広告ポリシーに配慮し、機能、制限、プライバシーを明確に説明します。',
+        cropTitle: 'マウスで範囲を選択', cropText: '下のプレビュー上でページをドラッグしてください。選択した四角形だけを新しいPDFとして保存します。', clearCropButton: '選択を消去', cropButton: '切り抜きPDFをダウンロード',
+        convertTitle: 'PDFをWordまたはPPTで保存', convertText: '最初のPDFをWord文書またはPowerPointプレゼンテーションとして書き出します。Wordはテキスト中心、PPTは各ページをスライド画像として保存します。', exportWordButton: 'Wordで保存', exportPptButton: 'PPTで保存',
+        privacyTitle: 'ファイルは保存されません', privacyText: 'PDF Masterはブラウザ内で動作し、選択ファイルをサーバーへアップロードしません。', offlineTitle: '状態は残りません', offlineText: 'ページを更新または閉じると、選択ファイル一覧と作業状態は消えます。', safeTitle: 'Word/PPTもローカル変換', safeText: '.docxと.pptxはブラウザ内でPDFに変換され、同じツールで処理されます。古い.doc/.pptは先に新しい形式で保存してください。',
         guideEyebrow: 'ガイド', guideTitle: 'PDF Masterの使い方',
-        faqOneTitle: 'PDF結合', faqOneText: 'ファイルを追加し、矢印で順番を整えて結合PDFをダウンロードします。', faqTwoTitle: 'PDF分割', faqTwoText: '最初のPDFを基準にページ範囲を入力し、そのページだけを保存します。', faqThreeTitle: 'ページ順序変更', faqThreeText: '希望する順序でページ番号を入力すると、並べ替えたPDFを作成できます。', faqFourTitle: '切り抜き', faqFourText: '余白をポイント単位で入力します。元ファイルは変更されず、新しいファイルだけ作成されます。',
-        footerText: '無料のプライベートPDFツール。サーバーアップロードなし。ファイル保存なし。', ready: 'PDFを追加すると開始できます。', processing: 'PDFを処理中...', done: '完了しました。ダウンロードを開始します。', needFiles: '先にPDFを追加してください。', needTwo: '結合には2つ以上のPDFが必要です。', invalidRange: 'ページ範囲を確認してください。', invalidCrop: '切り抜き値がページサイズより大きいです。', loading: '読み込み中', pages: 'ページ', remove: '削除', moveUp: '上へ', moveDown: '下へ'
+        faqOneTitle: 'PDF結合', faqOneText: 'ファイルを追加し、矢印で順番を整えて結合PDFをダウンロードします。', faqTwoTitle: 'PDF分割', faqTwoText: 'プレビューでページを選択、または範囲を入力して、そのページだけを保存します。', faqThreeTitle: 'ページ順序変更', faqThreeText: '希望する順序でページ番号を入力すると、並べ替えたPDFを作成できます。', faqFourTitle: '切り抜き', faqFourText: 'プレビュー上で範囲をドラッグします。元ファイルは変更されず、選択範囲だけが新しいファイルになります。',
+        previewTitle: 'ページプレビュー', previewText: '最初のPDFを確認し、分割ページをクリック、または切り抜きタブでドラッグします。', previewEmpty: 'PDFを追加するとページがここに表示されます。', previewRendering: 'ページを描画中...', previewError: 'PDFプレビューを作成できませんでした。', pageLabel: 'ページ', clickSelectHint: 'クリック', dragCropHint: 'ドラッグ', selectedPages: '選択ページ:', needCropSelection: '先にプレビューで切り抜く範囲をドラッグしてください。', cropSelected: '切り抜き範囲: ページ',
+        footerText: '無料のプライベートPDFツール。サーバーアップロードなし。ファイル保存なし。', privacyLink: 'プライバシーポリシー', ready: 'PDFを追加すると開始できます。', processing: 'PDFを処理中...', converting: 'ファイルをPDFに変換中...', exporting: 'ファイルを書き出し中...', done: '完了しました。ダウンロードを開始します。', convertedFrom: 'PDFに変換済み', unsupportedFile: 'ファイル形式を確認してください。PDF、DOCX、PPTXに対応しています。', needFiles: '先にPDFを追加してください。', needTwo: '結合には2つ以上のPDFが必要です。', invalidRange: 'ページ範囲を確認してください。', invalidCrop: '切り抜き範囲を確認してください。', loading: '読み込み中', pages: 'ページ', remove: '削除', moveUp: '上へ', moveDown: '下へ'
       }
     };
 
@@ -830,10 +983,18 @@
       return 'en';
     }
 
-    const state = { files: [], lang: detectDefaultLanguage() };
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    const state = {
+      files: [],
+      lang: detectDefaultLanguage(),
+      selectedSplitPages: new Set(),
+      cropSelection: null,
+      previewRun: 0
+    };
     const elements = {
       languageSelect: document.querySelector('#languageSelect'), fileInput: document.querySelector('#fileInput'), dropZone: document.querySelector('#dropZone'), fileList: document.querySelector('#fileList'), status: document.querySelector('#status'),
-      splitRanges: document.querySelector('#splitRanges'), reorderRanges: document.querySelector('#reorderRanges'), cropRanges: document.querySelector('#cropRanges'), cropTop: document.querySelector('#cropTop'), cropRight: document.querySelector('#cropRight'), cropBottom: document.querySelector('#cropBottom'), cropLeft: document.querySelector('#cropLeft')
+      splitRanges: document.querySelector('#splitRanges'), reorderRanges: document.querySelector('#reorderRanges'), pagePreview: document.querySelector('#pagePreview'), previewMeta: document.querySelector('#previewMeta'), clearCropBtn: document.querySelector('#clearCropBtn'), privacyLink: document.querySelector('#privacyLink')
     };
 
     function text(key) {
@@ -846,6 +1007,8 @@
       elements.languageSelect.value = state.lang;
       document.querySelectorAll('[data-i18n]').forEach((node) => { node.textContent = text(node.dataset.i18n); });
       renderFiles();
+      updatePreviewLabels();
+      elements.privacyLink.href = `privacy.html?lang=${state.lang}`;
       setStatus(text('ready'));
       const url = new URL(location.href);
       url.searchParams.set('lang', state.lang);
@@ -864,15 +1027,35 @@
       return `${(bytes / Math.pow(1024, index)).toFixed(index ? 1 : 0)} ${units[index]}`;
     }
 
+    function isPdfFile(file) {
+      return file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+    }
+
+    function isDocxFile(file) {
+      return file.name.toLowerCase().endsWith('.docx');
+    }
+
+    function isPptxFile(file) {
+      return file.name.toLowerCase().endsWith('.pptx');
+    }
+
+    function stripExtension(name) {
+      return name.replace(/\.[^.]+$/, '');
+    }
+
     async function addFiles(fileList) {
-      const pdfFiles = [...fileList].filter((file) => file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf'));
-      for (const file of pdfFiles) {
-        const bytes = await file.arrayBuffer();
+      const acceptedFiles = [...fileList].filter((file) => isPdfFile(file) || isDocxFile(file) || isPptxFile(file));
+      for (const file of acceptedFiles) {
+        setStatus(isPdfFile(file) ? text('processing') : text('converting'));
+        const originalBytes = await file.arrayBuffer();
+        const bytes = isPdfFile(file) ? originalBytes : await convertOfficeFileToPdf(file, originalBytes);
         const pdf = await PDFLib.PDFDocument.load(bytes, { ignoreEncryption: true });
-        state.files.push({ id: crypto.randomUUID(), name: file.name, size: file.size, bytes, pageCount: pdf.getPageCount() });
+        const displayName = isPdfFile(file) ? file.name : `${stripExtension(file.name)}.pdf`;
+        state.files.push({ id: crypto.randomUUID(), name: displayName, originalName: file.name, size: file.size, bytes, pageCount: pdf.getPageCount(), converted: !isPdfFile(file) });
       }
       renderFiles();
-      setStatus(pdfFiles.length ? text('ready') : text('needFiles'), pdfFiles.length ? '' : 'error');
+      await renderPreview();
+      setStatus(acceptedFiles.length ? text('ready') : text('unsupportedFile'), acceptedFiles.length ? '' : 'error');
     }
 
     function renderFiles() {
@@ -883,7 +1066,7 @@
         item.innerHTML = `
           <div>
             <div class="file-name" title="${escapeHtml(file.name)}">${escapeHtml(file.name)}</div>
-            <div class="file-meta">${file.pageCount || text('loading')} ${text('pages')} · ${formatBytes(file.size)}</div>
+            <div class="file-meta">${file.pageCount || text('loading')} ${text('pages')} · ${formatBytes(file.size)}${file.converted ? ` · ${text('convertedFrom')} ${escapeHtml(file.originalName)}` : ''}</div>
           </div>
           <div class="file-actions">
             <button class="icon-btn" type="button" title="${text('moveUp')}" aria-label="${text('moveUp')}" data-action="up" data-index="${index}"><i data-lucide="arrow-up"></i></button>
@@ -893,6 +1076,161 @@
         elements.fileList.appendChild(item);
       });
       lucide.createIcons();
+    }
+
+    function getActiveTab() {
+      return document.querySelector('.tab.active')?.dataset.tab || 'merge';
+    }
+
+    function resetPageSelections() {
+      state.selectedSplitPages.clear();
+      state.cropSelection = null;
+    }
+
+    function updatePreviewLabels() {
+      if (!elements.pagePreview) return;
+      const firstFile = state.files[0];
+      elements.previewMeta.textContent = firstFile ? `${firstFile.name} · ${firstFile.pageCount} ${text('pages')}` : '';
+      document.querySelectorAll('.page-tile').forEach((tile) => {
+        const pageNumber = Number(tile.dataset.pageIndex) + 1;
+        tile.querySelector('[data-page-title]').textContent = `${text('pageLabel')} ${pageNumber}`;
+        tile.querySelector('[data-page-action]').textContent = getActiveTab() === 'crop' ? text('dragCropHint') : text('clickSelectHint');
+      });
+      const empty = elements.pagePreview.querySelector('.preview-empty');
+      if (empty) empty.textContent = text('previewEmpty');
+    }
+
+    async function renderPreview() {
+      const runId = ++state.previewRun;
+      resetPageSelections();
+      elements.pagePreview.innerHTML = `<div class="preview-empty">${text('previewRendering')}</div>`;
+      elements.previewMeta.textContent = '';
+      const firstFile = state.files[0];
+      if (!firstFile) {
+        elements.pagePreview.innerHTML = `<div class="preview-empty">${text('previewEmpty')}</div>`;
+        return;
+      }
+
+      try {
+        const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(firstFile.bytes.slice(0)) }).promise;
+        if (runId !== state.previewRun) return;
+        elements.pagePreview.innerHTML = '';
+        elements.previewMeta.textContent = `${firstFile.name} · ${pdf.numPages} ${text('pages')}`;
+
+        for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
+          const page = await pdf.getPage(pageNumber);
+          if (runId !== state.previewRun) return;
+          const unscaledViewport = page.getViewport({ scale: 1 });
+          const scale = Math.min(1.15, 168 / unscaledViewport.width);
+          const viewport = page.getViewport({ scale });
+          const tile = document.createElement('button');
+          tile.type = 'button';
+          tile.className = 'page-tile';
+          tile.dataset.pageIndex = String(pageNumber - 1);
+          tile.dataset.pdfWidth = String(unscaledViewport.width);
+          tile.dataset.pdfHeight = String(unscaledViewport.height);
+          tile.innerHTML = `
+            <div class="page-canvas-wrap">
+              <canvas></canvas>
+              <span class="crop-selection"></span>
+            </div>
+            <span class="page-label"><span data-page-title>${text('pageLabel')} ${pageNumber}</span><span data-page-action>${getActiveTab() === 'crop' ? text('dragCropHint') : text('clickSelectHint')}</span></span>`;
+          elements.pagePreview.appendChild(tile);
+
+          const canvas = tile.querySelector('canvas');
+          const context = canvas.getContext('2d');
+          const dpr = window.devicePixelRatio || 1;
+          canvas.width = Math.floor(viewport.width * dpr);
+          canvas.height = Math.floor(viewport.height * dpr);
+          canvas.style.width = `${Math.floor(viewport.width)}px`;
+          canvas.style.height = `${Math.floor(viewport.height)}px`;
+          context.setTransform(dpr, 0, 0, dpr, 0, 0);
+          await renderPageWithTimeout(page, context, viewport);
+        }
+      } catch (error) {
+        elements.pagePreview.innerHTML = `<div class="preview-empty">${text('previewError')}</div>`;
+        setStatus(error.message || text('previewError'), 'error');
+      }
+    }
+
+    async function renderPageWithTimeout(page, canvasContext, viewport, timeoutMs = 4500) {
+      const renderTask = page.render({ canvasContext, viewport });
+      let timeoutId;
+      try {
+        await Promise.race([
+          renderTask.promise,
+          new Promise((_, reject) => {
+            timeoutId = window.setTimeout(() => reject(new Error('render-timeout')), timeoutMs);
+          })
+        ]);
+      } catch (error) {
+        if (error.message === 'render-timeout') renderTask.cancel();
+      } finally {
+        window.clearTimeout(timeoutId);
+      }
+    }
+
+    function toggleSplitPage(tile) {
+      const index = Number(tile.dataset.pageIndex);
+      if (state.selectedSplitPages.has(index)) {
+        state.selectedSplitPages.delete(index);
+        tile.classList.remove('selected');
+      } else {
+        state.selectedSplitPages.add(index);
+        tile.classList.add('selected');
+      }
+      const selected = [...state.selectedSplitPages].sort((a, b) => a - b).map((page) => page + 1);
+      elements.splitRanges.value = selected.join(', ');
+      setStatus(selected.length ? `${text('selectedPages')} ${selected.join(', ')}` : text('ready'));
+    }
+
+    function getCanvasPoint(event, tile) {
+      const canvas = tile.querySelector('canvas');
+      const rect = canvas.getBoundingClientRect();
+      const x = Math.min(Math.max(event.clientX - rect.left, 0), rect.width);
+      const y = Math.min(Math.max(event.clientY - rect.top, 0), rect.height);
+      return { x, y, rect };
+    }
+
+    function drawCropSelection(tile, start, end) {
+      const selection = tile.querySelector('.crop-selection');
+      const x = Math.min(start.x, end.x);
+      const y = Math.min(start.y, end.y);
+      const width = Math.abs(end.x - start.x);
+      const height = Math.abs(end.y - start.y);
+      selection.style.left = `${x}px`;
+      selection.style.top = `${y}px`;
+      selection.style.width = `${width}px`;
+      selection.style.height = `${height}px`;
+      tile.classList.add('has-crop', 'crop-active');
+      return { x, y, width, height };
+    }
+
+    function storeCropSelection(tile, cssBox) {
+      const canvas = tile.querySelector('canvas');
+      const pdfWidth = Number(tile.dataset.pdfWidth);
+      const pdfHeight = Number(tile.dataset.pdfHeight);
+      if (cssBox.width < 8 || cssBox.height < 8) {
+        clearCropSelection();
+        setStatus(text('needCropSelection'), 'error');
+        return;
+      }
+      state.cropSelection = {
+        pageIndex: Number(tile.dataset.pageIndex),
+        x: cssBox.x / canvas.clientWidth * pdfWidth,
+        y: pdfHeight - ((cssBox.y + cssBox.height) / canvas.clientHeight * pdfHeight),
+        width: cssBox.width / canvas.clientWidth * pdfWidth,
+        height: cssBox.height / canvas.clientHeight * pdfHeight
+      };
+      document.querySelectorAll('.page-tile').forEach((item) => {
+        if (item !== tile) item.classList.remove('has-crop', 'crop-active');
+      });
+      setStatus(`${text('cropSelected')} ${state.cropSelection.pageIndex + 1}`, 'success');
+    }
+
+    function clearCropSelection() {
+      state.cropSelection = null;
+      document.querySelectorAll('.page-tile').forEach((tile) => tile.classList.remove('has-crop', 'crop-active'));
     }
 
     function escapeHtml(value) {
@@ -936,7 +1274,9 @@
 
     async function splitPdf() {
       const source = await loadFirstPdf();
-      const pages = parseRanges(elements.splitRanges.value, source.getPageCount());
+      const pages = state.selectedSplitPages.size
+        ? [...state.selectedSplitPages].sort((a, b) => a - b)
+        : parseRanges(elements.splitRanges.value, source.getPageCount());
       const output = await PDFLib.PDFDocument.create();
       const copied = await output.copyPages(source, pages);
       copied.forEach((page) => output.addPage(page));
@@ -954,25 +1294,184 @@
 
     async function cropPdf() {
       const source = await loadFirstPdf();
-      const selected = new Set(parseRanges(elements.cropRanges.value, source.getPageCount()));
+      if (!state.cropSelection) throw new Error(text('needCropSelection'));
       const output = await PDFLib.PDFDocument.create();
-      const copied = await output.copyPages(source, source.getPageIndices());
-      const top = Number(elements.cropTop.value || 0);
-      const right = Number(elements.cropRight.value || 0);
-      const bottom = Number(elements.cropBottom.value || 0);
-      const left = Number(elements.cropLeft.value || 0);
-      copied.forEach((page, index) => {
-        if (selected.has(index)) {
-          const { width, height } = page.getSize();
-          const cropWidth = width - left - right;
-          const cropHeight = height - top - bottom;
-          if (cropWidth <= 0 || cropHeight <= 0) throw new Error(text('invalidCrop'));
-          page.setCropBox(left, bottom, cropWidth, cropHeight);
-          page.setMediaBox(left, bottom, cropWidth, cropHeight);
-        }
-        output.addPage(page);
-      });
+      const [page] = await output.copyPages(source, [state.cropSelection.pageIndex]);
+      const { x, y, width, height } = state.cropSelection;
+      if (width <= 0 || height <= 0) throw new Error(text('invalidCrop'));
+      page.setCropBox(x, y, width, height);
+      page.setMediaBox(x, y, width, height);
+      output.addPage(page);
       return output.save();
+    }
+
+    function wrapText(textValue, maxLength = 72) {
+      const words = String(textValue || '').replace(/\s+/g, ' ').trim().split(' ');
+      const lines = [];
+      let line = '';
+      for (const word of words) {
+        if (!word) continue;
+        if ((line + word).length > maxLength) {
+          if (line) lines.push(line.trim());
+          line = `${word} `;
+        } else {
+          line += `${word} `;
+        }
+      }
+      if (line.trim()) lines.push(line.trim());
+      return lines.length ? lines : [''];
+    }
+
+    function toPdfSafeText(value) {
+      return String(value || '').normalize('NFKD').replace(/[^\x20-\x7E]/g, ' ').replace(/\s+/g, ' ').trim();
+    }
+
+    async function createPdfFromTextPages(textPages, options = {}) {
+      const output = await PDFLib.PDFDocument.create();
+      const font = await output.embedFont(PDFLib.StandardFonts.Helvetica);
+      const pageSize = options.landscape ? [842, 595] : [595, 842];
+      for (const textPage of textPages) {
+        let page = output.addPage(pageSize);
+        let y = pageSize[1] - 56;
+        const title = toPdfSafeText(textPage.title || '');
+        if (title) {
+          page.drawText(title.slice(0, 90), { x: 48, y, size: 18, font, color: PDFLib.rgb(0.09, 0.13, 0.19) });
+          y -= 34;
+        }
+        const lines = String(textPage.text || '').split('\n').flatMap((line) => wrapText(toPdfSafeText(line), options.landscape ? 96 : 72));
+        for (const line of lines) {
+          if (y < 56) {
+            page = output.addPage(pageSize);
+            y = pageSize[1] - 56;
+          }
+          page.drawText(line.slice(0, 130), { x: 48, y, size: 11, font, color: PDFLib.rgb(0.09, 0.13, 0.19) });
+          y -= 17;
+        }
+      }
+      return output.save();
+    }
+
+    async function convertDocxToPdf(file, arrayBuffer) {
+      const result = await mammoth.extractRawText({ arrayBuffer });
+      return createPdfFromTextPages([{ title: file.name, text: result.value || file.name }]);
+    }
+
+    function sortSlidePaths(paths) {
+      return paths.sort((left, right) => Number(left.match(/slide(\d+)\.xml/)?.[1] || 0) - Number(right.match(/slide(\d+)\.xml/)?.[1] || 0));
+    }
+
+    async function convertPptxToPdf(file, arrayBuffer) {
+      const zip = await JSZip.loadAsync(arrayBuffer);
+      const slidePaths = sortSlidePaths(Object.keys(zip.files).filter((path) => /^ppt\/slides\/slide\d+\.xml$/.test(path)));
+      const parser = new DOMParser();
+      const textPages = [];
+      for (const path of slidePaths) {
+        const xml = await zip.file(path).async('text');
+        const doc = parser.parseFromString(xml, 'application/xml');
+        const parts = [...doc.getElementsByTagName('a:t')].map((node) => node.textContent).filter(Boolean);
+        textPages.push({ title: `${file.name} - slide ${textPages.length + 1}`, text: parts.join('\n') || file.name });
+      }
+      return createPdfFromTextPages(textPages.length ? textPages : [{ title: file.name, text: file.name }], { landscape: true });
+    }
+
+    async function convertOfficeFileToPdf(file, arrayBuffer) {
+      if (isDocxFile(file)) return convertDocxToPdf(file, arrayBuffer);
+      if (isPptxFile(file)) return convertPptxToPdf(file, arrayBuffer);
+      throw new Error(text('unsupportedFile'));
+    }
+
+    async function getFirstPdfJsDocument() {
+      if (!state.files.length) throw new Error(text('needFiles'));
+      return pdfjsLib.getDocument({ data: new Uint8Array(state.files[0].bytes.slice(0)) }).promise;
+    }
+
+    function escapeXml(value) {
+      return String(value || '').replace(/[<>&"']/g, (char) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&apos;' }[char]));
+    }
+
+    async function extractPdfTextPages() {
+      const pdf = await getFirstPdfJsDocument();
+      const pages = [];
+      for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
+        const page = await pdf.getPage(pageNumber);
+        const content = await page.getTextContent();
+        const textValue = content.items.map((item) => item.str).join(' ').replace(/\s+/g, ' ').trim();
+        pages.push({ title: `${text('pageLabel')} ${pageNumber}`, text: textValue || `${text('pageLabel')} ${pageNumber}` });
+      }
+      return pages;
+    }
+
+    async function exportPdfToWord() {
+      const pages = await extractPdfTextPages();
+      const zip = new JSZip();
+      zip.file('[Content_Types].xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/><Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/></Types>');
+      zip.folder('_rels').file('.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>');
+      zip.folder('docProps').file('core.xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:title>PDF Master Export</dc:title><dc:creator>PDF Master</dc:creator></cp:coreProperties>');
+      zip.folder('docProps').file('app.xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"><Application>PDF Master</Application></Properties>');
+      const body = pages.map((page) => {
+        const titleXml = `<w:p><w:r><w:rPr><w:b/></w:rPr><w:t>${escapeXml(page.title)}</w:t></w:r></w:p>`;
+        const paragraphXml = String(page.text || '').split(/\n+/).flatMap((line) => wrapText(line, 95)).map((line) => `<w:p><w:r><w:t xml:space="preserve">${escapeXml(line)}</w:t></w:r></w:p>`).join('');
+        return `${titleXml}${paragraphXml}<w:p><w:r><w:br w:type="page"/></w:r></w:p>`;
+      }).join('');
+      zip.folder('word').file('document.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>${body}<w:sectPr><w:pgSz w:w="12240" w:h="15840"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440"/></w:sectPr></w:body></w:document>`);
+      return zip.generateAsync({ type: 'blob', mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+    }
+
+    async function renderPdfPageImages(scale = 1.5) {
+      const previewCanvases = [...document.querySelectorAll('.page-tile canvas')];
+      if (previewCanvases.length) {
+        return previewCanvases.map((canvas) => ({
+          data: canvas.toDataURL('image/png'),
+          width: canvas.width,
+          height: canvas.height
+        }));
+      }
+
+      const pdf = await getFirstPdfJsDocument();
+      const images = [];
+      for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
+        const page = await pdf.getPage(pageNumber);
+        const viewport = page.getViewport({ scale });
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.floor(viewport.width);
+        canvas.height = Math.floor(viewport.height);
+        await renderPageWithTimeout(page, canvas.getContext('2d'), viewport);
+        images.push({ data: canvas.toDataURL('image/png'), width: viewport.width, height: viewport.height });
+      }
+      return images;
+    }
+
+    async function exportPdfToPpt() {
+      const images = await renderPdfPageImages(1.35);
+      const pptx = new PptxGenJS();
+      pptx.layout = 'LAYOUT_WIDE';
+      pptx.author = 'PDF Master';
+      for (const image of images) {
+        const slide = pptx.addSlide();
+        slide.background = { color: 'FFFFFF' };
+        const slideWidth = 13.333;
+        const slideHeight = 7.5;
+        const imageRatio = image.width / image.height;
+        const slideRatio = slideWidth / slideHeight;
+        let width = slideWidth;
+        let height = slideHeight;
+        if (imageRatio > slideRatio) {
+          height = width / imageRatio;
+        } else {
+          width = height * imageRatio;
+        }
+        slide.addImage({ data: image.data, x: (slideWidth - width) / 2, y: (slideHeight - height) / 2, w: width, h: height });
+      }
+      return pptx.write({ outputType: 'blob' });
+    }
+
+    function downloadBlob(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      link.click();
+      URL.revokeObjectURL(url);
     }
 
     async function runTask(task, filename) {
@@ -980,12 +1479,18 @@
         setStatus(text('processing'));
         const bytes = await task();
         const blob = new Blob([bytes], { type: 'application/pdf' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = filename;
-        link.click();
-        URL.revokeObjectURL(url);
+        downloadBlob(blob, filename);
+        setStatus(text('done'), 'success');
+      } catch (error) {
+        setStatus(error.message || text('invalidRange'), 'error');
+      }
+    }
+
+    async function runExport(task, filename) {
+      try {
+        setStatus(text('exporting'));
+        const blob = await task();
+        downloadBlob(blob, filename);
         setStatus(text('done'), 'success');
       } catch (error) {
         setStatus(error.message || text('invalidRange'), 'error');
@@ -1007,6 +1512,43 @@
       if (action === 'up' && index > 0) [state.files[index - 1], state.files[index]] = [state.files[index], state.files[index - 1]];
       if (action === 'down' && index < state.files.length - 1) [state.files[index + 1], state.files[index]] = [state.files[index], state.files[index + 1]];
       renderFiles();
+      renderPreview();
+    });
+
+    let cropDrag = null;
+    elements.pagePreview.addEventListener('click', (event) => {
+      const tile = event.target.closest('.page-tile');
+      if (!tile || getActiveTab() !== 'split') return;
+      toggleSplitPage(tile);
+    });
+
+    elements.pagePreview.addEventListener('mousedown', (event) => {
+      const tile = event.target.closest('.page-tile');
+      if (!tile || getActiveTab() !== 'crop') return;
+      event.preventDefault();
+      clearCropSelection();
+      cropDrag = { tile, start: getCanvasPoint(event, tile) };
+      drawCropSelection(tile, cropDrag.start, cropDrag.start);
+    });
+
+    window.addEventListener('mousemove', (event) => {
+      if (!cropDrag) return;
+      event.preventDefault();
+      const current = getCanvasPoint(event, cropDrag.tile);
+      drawCropSelection(cropDrag.tile, cropDrag.start, current);
+    });
+
+    window.addEventListener('mouseup', (event) => {
+      if (!cropDrag) return;
+      event.preventDefault();
+      const current = getCanvasPoint(event, cropDrag.tile);
+      const box = drawCropSelection(cropDrag.tile, cropDrag.start, current);
+      storeCropSelection(cropDrag.tile, box);
+      cropDrag = null;
+    });
+    elements.clearCropBtn.addEventListener('click', () => {
+      clearCropSelection();
+      setStatus(text('ready'));
     });
 
     document.querySelectorAll('.tab').forEach((tab) => {
@@ -1016,6 +1558,7 @@
         tab.classList.add('active');
         tab.setAttribute('aria-selected', 'true');
         document.querySelector(`#${tab.dataset.tab}`).classList.add('active');
+        updatePreviewLabels();
       });
     });
 
@@ -1023,6 +1566,8 @@
     document.querySelector('#splitBtn').addEventListener('click', () => runTask(splitPdf, 'pdf-master-split.pdf'));
     document.querySelector('#reorderBtn').addEventListener('click', () => runTask(reorderPdf, 'pdf-master-reordered.pdf'));
     document.querySelector('#cropBtn').addEventListener('click', () => runTask(cropPdf, 'pdf-master-cropped.pdf'));
+    document.querySelector('#exportWordBtn').addEventListener('click', () => runExport(exportPdfToWord, 'pdf-master-export.docx'));
+    document.querySelector('#exportPptBtn').addEventListener('click', () => runExport(exportPdfToPpt, 'pdf-master-export.pptx'));
 
     window.addEventListener('beforeunload', () => { state.files = []; });
     lucide.createIcons();

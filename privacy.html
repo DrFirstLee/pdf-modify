@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy Policy - PDF Master</title>
+  <meta name="description" content="PDF Master privacy policy. PDF files are processed in your browser and are not uploaded, stored, or shared by PDF Master.">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#f7f4ea">
+  <link rel="canonical" href="/privacy.html">
+  <link rel="alternate" hreflang="ko" href="/privacy.html?lang=ko">
+  <link rel="alternate" hreflang="en" href="/privacy.html?lang=en">
+  <link rel="alternate" hreflang="es" href="/privacy.html?lang=es">
+  <link rel="alternate" hreflang="ja" href="/privacy.html?lang=ja">
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f7f4ea;
+      --surface: #ffffff;
+      --ink: #182230;
+      --muted: #667085;
+      --line: #d8d3c7;
+      --accent: #e8503a;
+      --accent-strong: #bf2f22;
+      --teal: #0f766e;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      background: var(--paper);
+      color: var(--ink);
+    }
+
+    a { color: inherit; }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px clamp(16px, 4vw, 40px);
+      border-bottom: 1px solid rgba(24, 34, 48, 0.12);
+      background: rgba(247, 244, 234, 0.94);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 900;
+      text-decoration: none;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 7px;
+      color: #fff;
+      background: var(--accent);
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .lang-select, .home-link {
+      min-height: 40px;
+      border-radius: 7px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--ink);
+    }
+
+    .lang-select { padding: 0 12px; }
+
+    .home-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 14px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    main {
+      width: min(980px, 100%);
+      margin: 0 auto;
+      padding: clamp(28px, 6vw, 70px) clamp(16px, 4vw, 34px) 54px;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--accent-strong);
+      font-size: 0.78rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    h1 {
+      margin: 0 0 14px;
+      font-size: clamp(2.2rem, 7vw, 5rem);
+      line-height: 0.98;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      max-width: 760px;
+      margin: 0 0 28px;
+      color: var(--muted);
+      font-size: clamp(1rem, 2vw, 1.18rem);
+      line-height: 1.65;
+    }
+
+    .policy-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .policy-card, .summary {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      box-shadow: 0 1px 0 rgba(24, 34, 48, 0.03);
+    }
+
+    .summary {
+      padding: 20px;
+      border-left: 5px solid var(--teal);
+    }
+
+    .summary strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 1.08rem;
+    }
+
+    .summary p, .policy-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .policy-card { padding: 18px; }
+
+    .policy-card h2 {
+      margin: 0 0 8px;
+      font-size: 1.08rem;
+      letter-spacing: 0;
+    }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      padding: 24px clamp(16px, 4vw, 40px);
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      background: #efeadf;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 720px) {
+      .topbar { align-items: flex-start; }
+      .policy-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a id="brandLink" class="brand" href="index.html" aria-label="PDF Master home">
+      <span class="brand-mark">PDF</span>
+      <span>PDF Master</span>
+    </a>
+    <nav class="nav" aria-label="Privacy navigation">
+      <select id="languageSelect" class="lang-select" aria-label="Language">
+        <option value="ko">한국어</option>
+        <option value="en">English</option>
+        <option value="es">Español</option>
+        <option value="ja">日本語</option>
+      </select>
+      <a id="homeLink" class="home-link" href="index.html" data-i18n="homeLink">홈으로</a>
+    </nav>
+  </header>
+
+  <main>
+    <p class="eyebrow" data-i18n="eyebrow">개인정보 보호</p>
+    <h1 data-i18n="title">개인정보처리방침</h1>
+    <p class="lead" data-i18n="lead">PDF Master는 아무 개인정보도 저장하지 않습니다. PDF 파일, 파일 이름, 작업 내용, 선택 영역, 페이지 정보도 서버에 업로드하거나 저장하지 않습니다.</p>
+
+    <section class="summary" aria-label="Privacy summary">
+      <strong data-i18n="summaryTitle">아무 개인정보도 저장하지 않습니다</strong>
+      <p data-i18n="summaryText">사용자가 선택한 PDF는 브라우저 안에서만 처리됩니다. 페이지를 닫거나 새로고침하면 선택한 파일과 작업 상태는 사라집니다.</p>
+    </section>
+
+    <section class="policy-grid" aria-label="Privacy details">
+      <article class="policy-card">
+        <h2 data-i18n="cardOneTitle">저장하지 않는 정보</h2>
+        <p data-i18n="cardOneText">PDF 파일, 문서 내용, 파일 이름, 페이지 선택, 크롭 영역, 병합 순서 등 사용자가 작업한 정보를 PDF Master는 저장하지 않습니다.</p>
+      </article>
+      <article class="policy-card">
+        <h2 data-i18n="cardTwoTitle">업로드하지 않는 처리 방식</h2>
+        <p data-i18n="cardTwoText">PDF 분할, 병합, 순서 변경, 크롭 작업은 사용자의 브라우저 메모리에서 실행됩니다. 별도의 파일 업로드 서버를 사용하지 않습니다.</p>
+      </article>
+      <article class="policy-card">
+        <h2 data-i18n="cardThreeTitle">브라우저 세션</h2>
+        <p data-i18n="cardThreeText">작업 중 표시되는 미리보기와 선택 상태는 현재 페이지에서만 유지됩니다. 페이지를 닫거나 새로고침하면 초기화됩니다.</p>
+      </article>
+      <article class="policy-card">
+        <h2 data-i18n="cardFourTitle">외부 서비스</h2>
+        <p data-i18n="cardFourText">사이트 운영을 위해 정적 호스팅, 검색 등록, 광고 서비스가 사용될 수 있습니다. 다만 PDF Master 자체는 사용자의 PDF 파일을 수집하거나 보관하지 않습니다.</p>
+      </article>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>PDF Master</span>
+    <span data-i18n="footerText">파일 저장 없음. 서버 업로드 없음.</span>
+  </footer>
+
+  <script>
+    const translations = {
+      ko: {
+        homeLink: '홈으로', eyebrow: '개인정보 보호', title: '개인정보처리방침',
+        lead: 'PDF Master는 아무 개인정보도 저장하지 않습니다. PDF 파일, 파일 이름, 작업 내용, 선택 영역, 페이지 정보도 서버에 업로드하거나 저장하지 않습니다.',
+        summaryTitle: '아무 개인정보도 저장하지 않습니다', summaryText: '사용자가 선택한 PDF는 브라우저 안에서만 처리됩니다. 페이지를 닫거나 새로고침하면 선택한 파일과 작업 상태는 사라집니다.',
+        cardOneTitle: '저장하지 않는 정보', cardOneText: 'PDF 파일, 문서 내용, 파일 이름, 페이지 선택, 크롭 영역, 병합 순서 등 사용자가 작업한 정보를 PDF Master는 저장하지 않습니다.',
+        cardTwoTitle: '업로드하지 않는 처리 방식', cardTwoText: 'PDF 분할, 병합, 순서 변경, 크롭 작업은 사용자의 브라우저 메모리에서 실행됩니다. 별도의 파일 업로드 서버를 사용하지 않습니다.',
+        cardThreeTitle: '브라우저 세션', cardThreeText: '작업 중 표시되는 미리보기와 선택 상태는 현재 페이지에서만 유지됩니다. 페이지를 닫거나 새로고침하면 초기화됩니다.',
+        cardFourTitle: '외부 서비스', cardFourText: '사이트 운영을 위해 정적 호스팅, 검색 등록, 광고 서비스가 사용될 수 있습니다. 다만 PDF Master 자체는 사용자의 PDF 파일을 수집하거나 보관하지 않습니다.',
+        footerText: '파일 저장 없음. 서버 업로드 없음.'
+      },
+      en: {
+        homeLink: 'Home', eyebrow: 'Privacy', title: 'Privacy Policy',
+        lead: 'PDF Master does not store any personal information. It also does not upload or store PDF files, file names, document contents, selected areas, page choices, or processing details on a server.',
+        summaryTitle: 'We do not store any personal information', summaryText: 'PDF files selected by the user are processed only inside the browser. When you close or refresh the page, selected files and work state disappear.',
+        cardOneTitle: 'Information We Do Not Store', cardOneText: 'PDF Master does not store PDF files, document contents, file names, selected pages, crop areas, merge order, or other work details.',
+        cardTwoTitle: 'No File Upload Processing', cardTwoText: 'PDF split, merge, reorder, and crop actions run in your browser memory. PDF Master does not use a separate file upload server.',
+        cardThreeTitle: 'Browser Session', cardThreeText: 'Previews and selections shown during editing remain only on the current page. They reset when the page is closed or refreshed.',
+        cardFourTitle: 'External Services', cardFourText: 'Static hosting, search indexing, or advertising services may be used to operate the site. PDF Master itself does not collect or keep your PDF files.',
+        footerText: 'No file storage. No server upload.'
+      },
+      es: {
+        homeLink: 'Inicio', eyebrow: 'Privacidad', title: 'Política de privacidad',
+        lead: 'PDF Master no guarda ninguna información personal. Tampoco sube ni guarda archivos PDF, nombres de archivo, contenido, áreas seleccionadas, páginas elegidas ni detalles del proceso en un servidor.',
+        summaryTitle: 'No guardamos ninguna información personal', summaryText: 'Los PDF seleccionados se procesan solo dentro del navegador. Al cerrar o actualizar la página, los archivos y el estado de trabajo desaparecen.',
+        cardOneTitle: 'Información que no guardamos', cardOneText: 'PDF Master no guarda archivos PDF, contenido de documentos, nombres de archivo, páginas seleccionadas, áreas de recorte, orden de unión ni otros detalles.',
+        cardTwoTitle: 'Sin subida de archivos', cardTwoText: 'Dividir, unir, ordenar y recortar PDF se ejecuta en la memoria del navegador. PDF Master no usa un servidor separado para subir archivos.',
+        cardThreeTitle: 'Sesión del navegador', cardThreeText: 'Las vistas previas y selecciones se mantienen solo en la página actual. Se reinician al cerrar o actualizar la página.',
+        cardFourTitle: 'Servicios externos', cardFourText: 'Se pueden usar alojamiento estático, indexación de búsqueda o servicios de publicidad para operar el sitio. PDF Master no recopila ni conserva tus PDF.',
+        footerText: 'Sin almacenamiento de archivos. Sin subida al servidor.'
+      },
+      ja: {
+        homeLink: 'ホーム', eyebrow: 'プライバシー', title: 'プライバシーポリシー',
+        lead: 'PDF Masterは、個人情報を一切保存しません。PDFファイル、ファイル名、文書内容、選択範囲、ページ選択、処理内容もサーバーへアップロードまたは保存しません。',
+        summaryTitle: '個人情報を一切保存しません', summaryText: 'ユーザーが選択したPDFはブラウザ内だけで処理されます。ページを閉じる、または更新すると、選択ファイルと作業状態は消えます。',
+        cardOneTitle: '保存しない情報', cardOneText: 'PDF Masterは、PDFファイル、文書内容、ファイル名、選択ページ、切り抜き範囲、結合順序などの作業情報を保存しません。',
+        cardTwoTitle: 'アップロードしない処理', cardTwoText: 'PDFの分割、結合、並べ替え、切り抜きはブラウザのメモリ内で実行されます。別のファイルアップロードサーバーは使用しません。',
+        cardThreeTitle: 'ブラウザセッション', cardThreeText: '編集中のプレビューと選択状態は現在のページ内だけで保持されます。ページを閉じる、または更新するとリセットされます。',
+        cardFourTitle: '外部サービス', cardFourText: 'サイト運営のために静的ホスティング、検索登録、広告サービスを使用する場合があります。ただしPDF Master自体はPDFファイルを収集または保存しません。',
+        footerText: 'ファイル保存なし。サーバーアップロードなし。'
+      }
+    };
+
+    function detectDefaultLanguage() {
+      const requestedLang = new URLSearchParams(location.search).get('lang');
+      if (translations[requestedLang]) return requestedLang;
+      const browserLanguages = navigator.languages?.length ? navigator.languages : [navigator.language];
+      for (const language of browserLanguages) {
+        const lang = String(language || '').toLowerCase();
+        if (lang.startsWith('ko')) return 'ko';
+        if (lang.startsWith('en')) return 'en';
+        if (lang.startsWith('es')) return 'es';
+        if (lang.startsWith('ja')) return 'ja';
+      }
+      return 'en';
+    }
+
+    const languageSelect = document.querySelector('#languageSelect');
+    const homeLink = document.querySelector('#homeLink');
+    const brandLink = document.querySelector('#brandLink');
+
+    function setLanguage(lang) {
+      const activeLang = translations[lang] ? lang : 'en';
+      document.documentElement.lang = activeLang;
+      languageSelect.value = activeLang;
+      document.querySelectorAll('[data-i18n]').forEach((node) => {
+        node.textContent = translations[activeLang][node.dataset.i18n] || node.textContent;
+      });
+      document.title = `${translations[activeLang].title} - PDF Master`;
+      homeLink.href = `index.html?lang=${activeLang}`;
+      brandLink.href = `index.html?lang=${activeLang}`;
+      const url = new URL(location.href);
+      url.searchParams.set('lang', activeLang);
+      history.replaceState(null, '', url);
+    }
+
+    languageSelect.addEventListener('change', (event) => setLanguage(event.target.value));
+    setLanguage(detectDefaultLanguage());
+  </script>
+</body>
+</html>
