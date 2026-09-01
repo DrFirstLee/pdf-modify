@@ -594,6 +594,10 @@
       gap: 12px;
     }
 
+    .page-grid.crop-mode .page-group-grid {
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    }
+
     .page-tile {
       position: relative;
       display: grid;
@@ -644,11 +648,20 @@
       background: #ece7dc;
     }
 
+    .page-grid.crop-mode .page-canvas-wrap {
+      min-height: 390px;
+    }
+
     .page-canvas-wrap canvas {
       display: block;
       max-width: 100%;
       height: auto;
       box-shadow: 0 8px 20px rgba(24, 34, 48, 0.12);
+    }
+
+    .page-grid.crop-mode .page-canvas-wrap canvas {
+      width: min(100%, 320px) !important;
+      height: auto !important;
     }
 
     .crop-selection {
@@ -1161,6 +1174,7 @@
 
     function updatePreviewLabels() {
       if (!elements.pagePreview) return;
+      elements.pagePreview.classList.toggle('crop-mode', getActiveTab() === 'crop');
       const totalPages = state.files.reduce((sum, file) => sum + (file.pageCount || 0), 0);
       elements.previewMeta.textContent = totalPages ? `${state.files.length} ${text('filesLabel')} · ${totalPages} ${text('pages')}` : '';
       document.querySelectorAll('.page-tile').forEach((tile) => {
@@ -1256,6 +1270,7 @@
           }
         }
         elements.previewMeta.textContent = `${state.files.length} ${text('filesLabel')} · ${totalPages} ${text('pages')}`;
+        updatePreviewLabels();
       } catch (error) {
         elements.pagePreview.innerHTML = `<div class="preview-empty">${text('previewError')}</div>`;
         setStatus(error.message || text('previewError'), 'error');
@@ -1344,12 +1359,18 @@
 
     function drawCropSelection(tile, start, end) {
       const selection = tile.querySelector('.crop-selection');
+      const canvas = tile.querySelector('canvas');
+      const wrap = tile.querySelector('.page-canvas-wrap');
+      const canvasRect = canvas.getBoundingClientRect();
+      const wrapRect = wrap.getBoundingClientRect();
+      const canvasOffsetX = canvasRect.left - wrapRect.left;
+      const canvasOffsetY = canvasRect.top - wrapRect.top;
       const x = Math.min(start.x, end.x);
       const y = Math.min(start.y, end.y);
       const width = Math.abs(end.x - start.x);
       const height = Math.abs(end.y - start.y);
-      selection.style.left = `${x}px`;
-      selection.style.top = `${y}px`;
+      selection.style.left = `${x + canvasOffsetX}px`;
+      selection.style.top = `${y + canvasOffsetY}px`;
       selection.style.width = `${width}px`;
       selection.style.height = `${height}px`;
       tile.classList.add('has-crop', 'crop-active');
